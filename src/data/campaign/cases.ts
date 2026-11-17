@@ -32,7 +32,7 @@ export const EXTRA_OBJECTIVES: ObjectiveDef[] = [
 ];
 
 export const EXTRA_NPCS: NpcDef[] = [
-  { id: 'homem_terno', name: 'Homem de terno escuro', publicRole: 'Esteve no Bellevue pedindo o prontuário.', location: 'Desconhecida', initialTrust: 0, publicNotes: 'Ninguém lembra do rosto dele com clareza.' },
+  { id: 'homem_terno', gender: 'm', name: 'Homem de terno escuro', publicRole: 'Esteve no Bellevue pedindo o prontuário.', location: 'Desconhecida', initialTrust: 0, publicNotes: 'Ninguém lembra do rosto dele com clareza.' },
   { id: 'fonte_funeraria', name: 'Fonte da funerária', publicRole: 'Funcionário de funerária que procurou Liz Morgan.', location: 'Desconhecida', initialTrust: 1, publicNotes: 'Pediu anonimato. Deixou de responder.' },
 ];
 

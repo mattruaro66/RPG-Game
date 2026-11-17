@@ -27,6 +27,8 @@ export interface CharacterDef {
   name: string;
   nickname?: string;
   profession: ProfessionId;
+  /** Gênero do personagem (usado para escolher a voz). */
+  gender: 'm' | 'f';
   age: number;
   occupation: string;
   personality: string;
@@ -44,7 +46,7 @@ export interface CharacterDef {
 // CANÔNICO: nomes, profissões e atributos (13 pontos cada).
 export const CHARACTERS: CharacterDef[] = [
   {
-    id: 'jack', name: 'Jack Sullivan', profession: 'investigador', age: 42,
+    id: 'jack', name: 'Jack Sullivan', profession: 'investigador', gender: 'm', age: 42,
     occupation: 'Investigador particular, ex-policial do NYPD',
     personality: 'Cínico, pragmático, observador.',
     background: 'Possui um pequeno escritório em Midtown e enfrenta dificuldades financeiras. Está envolvido em uma investigação particular sobre o desaparecimento de Thomas Reed.',
@@ -67,7 +69,7 @@ export const CHARACTERS: CharacterDef[] = [
     },
   },
   {
-    id: 'daniel', name: 'Daniel Mercer', profession: 'medico', age: 36,
+    id: 'daniel', name: 'Daniel Mercer', profession: 'medico', gender: 'm', age: 36,
     occupation: 'Médico de emergência no Bellevue Hospital, Manhattan',
     personality: 'Reservado, metódico, racional e persistente.',
     background: 'Presencia a morte de um paciente com perda sanguínea incompatível com os ferimentos encontrados. A documentação médica do paciente desaparece.',
@@ -90,7 +92,7 @@ export const CHARACTERS: CharacterDef[] = [
     },
   },
   {
-    id: 'mick', name: 'Michael Donovan', nickname: 'Mick', profession: 'operativo', age: 38,
+    id: 'mick', name: 'Michael Donovan', nickname: 'Mick', profession: 'operativo', gender: 'm', age: 38,
     occupation: 'Ex-militar, segurança privada',
     personality: 'Disciplinado, prático, protetor e experiente em situações de risco.',
     background: 'Conhece Daniel Mercer e Raymond Vega por experiências profissionais anteriores.',
@@ -113,7 +115,7 @@ export const CHARACTERS: CharacterDef[] = [
     },
   },
   {
-    id: 'liz', name: 'Elizabeth Morgan', nickname: 'Liz', profession: 'jornalista', age: 31,
+    id: 'liz', name: 'Elizabeth Morgan', nickname: 'Liz', profession: 'jornalista', gender: 'f', age: 31,
     occupation: 'Jornalista investigativa do The Village Voice',
     personality: 'Determinada, curiosa, persuasiva e questionadora.',
     background: 'Recebe informações sobre cadáveres não identificados, registros incompletos e desaparecimentos.',
@@ -136,7 +138,7 @@ export const CHARACTERS: CharacterDef[] = [
     },
   },
   {
-    id: 'maggie', name: 'Margaret Holloway', nickname: 'Maggie', profession: 'ocultista', age: 32,
+    id: 'maggie', name: 'Margaret Holloway', nickname: 'Maggie', profession: 'ocultista', gender: 'f', age: 32,
     occupation: 'Pesquisadora independente, ligada ao mercado de livros',
     personality: 'Intelectual, introspectiva, interessada em fenômenos históricos e religiosos.',
     background: 'Possui conhecimentos que ajudam Liz a investigar elementos simbólicos e ocultistas.',
@@ -159,7 +161,7 @@ export const CHARACTERS: CharacterDef[] = [
     },
   },
   {
-    id: 'ray', name: 'Raymond Vega', nickname: 'Ray', profession: 'infiltrador', age: 34,
+    id: 'ray', name: 'Raymond Vega', nickname: 'Ray', profession: 'infiltrador', gender: 'm', age: 34,
     occupation: 'Técnico especializado em segurança e fechaduras',
     personality: 'Discreto, engenhoso, observador e adaptável.',
     background: 'Realiza trabalhos para Jack Sullivan e possui conexões com Michael e Maggie.',

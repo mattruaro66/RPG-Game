@@ -110,7 +110,7 @@ describe('Imagens e áudio', () => {
     s = chooseOption(s, 'quem');
     const lines = entriesToLines(s.narrative, DEFAULT_VOICES, 1);
     expect(lines.every((l) => l.language === 'pt-BR')).toBe(true);
-    expect(lines.some((l) => l.voice === DEFAULT_VOICES.victoria && l.text.includes('Thomas Reed'))).toBe(true);
+    expect(lines.some((l) => l.voice === DEFAULT_VOICES.feminino && l.role === 'f' && l.text.includes('Thomas Reed'))).toBe(true);
     expect(lines.some((l) => l.text.startsWith('Nova pista'))).toBe(false);
   });
 });

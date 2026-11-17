@@ -198,6 +198,10 @@ export interface NpcDef {
   name: string;
   /** Como o grupo se refere ao NPC antes de saber o nome. */
   alias?: string;
+  /** Gênero (para a voz). Sem valor: lê com a voz do narrador. */
+  gender?: 'm' | 'f';
+  /** Outros nomes com que aparece como locutor nos textos (ex.: “Sal”). */
+  voiceNames?: string[];
   /** Papel como o jogador o conhece. */
   publicRole: string;
   location: string;

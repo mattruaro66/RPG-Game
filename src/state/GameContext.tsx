@@ -4,7 +4,7 @@ import type { GameState } from '../engine/state';
 import type { CharacterSelection } from '../engine/party';
 import { DEFAULT_SETTINGS, loadGame, loadSettings, saveGame, saveSettings, type Settings, type SlotId } from '../persistence/storage';
 import { newGame } from './session';
-import { DEFAULT_VOICES, type VoiceCasting } from '../platform/voice';
+import { DEFAULT_VOICES, type VoiceCasting, type VoiceEngine } from '../platform/voice';
 import type { Voice } from '../platform/claude';
 
 export type Screen = 'menu' | 'prologo' | 'selecao' | 'jogo' | 'personagens' | 'regras' | 'config' | 'carregar' | 'galeria';
@@ -16,6 +16,9 @@ export interface AppSettings extends Settings {
   voiceRate: number;
   voices: Record<string, Voice>;
   voiceCasting: VoiceCasting;
+  voiceEngine: VoiceEngine;
+  /** Versão do esquema de vozes; ao mudar, o elenco volta ao padrão. */
+  voiceSchema: number;
 }
 
 interface Ctx {
@@ -35,10 +38,18 @@ interface Ctx {
 
 const GameCtx = createContext<Ctx | null>(null);
 
+const VOICE_SCHEMA = 2;
+
 function initialSettings(): AppSettings {
   const base = loadSettings() as Partial<AppSettings>;
-  const s = { ...DEFAULT_SETTINGS, minDamage: 0, bonusOnusConflict: 'onus_prevalece', autoNarrate: true, voiceRate: 1, voiceCasting: 'narrador', ...base } as AppSettings;
+  const s = { ...DEFAULT_SETTINGS, minDamage: 0, bonusOnusConflict: 'onus_prevalece', autoNarrate: true, voiceRate: 1, voiceCasting: 'genero', voiceEngine: 'claude', voiceSchema: VOICE_SCHEMA, ...base } as AppSettings;
   s.voices = { ...DEFAULT_VOICES, ...(base.voices ?? {}) };
+  if (base.voiceSchema !== VOICE_SCHEMA) {
+    // Elenco novo: narrador + voz masculina + voz feminina.
+    s.voiceCasting = 'genero';
+    s.voices = { ...DEFAULT_VOICES };
+    s.voiceSchema = VOICE_SCHEMA;
+  }
   return s;
 }
 

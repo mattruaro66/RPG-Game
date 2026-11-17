@@ -812,10 +812,11 @@ export const REED_CLUES: ClueDef[] = [
 ];
 
 export const REED_NPCS: NpcDef[] = [
-  { id: 'victoria', name: 'Victoria Whitmore', alias: 'A mulher de vermelho', publicRole: 'Cliente. Procura Thomas Reed, seu amante.', location: 'Desconhecida', initialTrust: 0, publicNotes: 'Roupas vermelhas extravagantes, óculos escuros, sobretudo vermelho. Casada com Richard Whitmore.' },
-  { id: 'thomas', name: 'Thomas Reed', publicRole: 'Consultor financeiro desaparecido.', location: 'Desconhecida', initialTrust: 0, publicNotes: '38 anos. Desaparecido há onze dias em 1º de dezembro de 1992.' },
-  { id: 'richard', name: 'Richard Whitmore', publicRole: 'Marido de Victoria. Credor de Jack Sullivan.', location: 'Manhattan', initialTrust: 0, publicNotes: 'Influente, com amigos na polícia.' },
-  { id: 'sal', name: 'Sal Benedetto', publicRole: 'Porteiro do prédio de Thomas Reed.', location: 'Rua 78 Leste, nº 211', initialTrust: 0, publicNotes: 'Sessenta e poucos anos, torcedor dos Knicks.' },
+  { id: 'victoria', gender: 'f', name: 'Victoria Whitmore', alias: 'A mulher de vermelho', publicRole: 'Cliente. Procura Thomas Reed, seu amante.', location: 'Desconhecida', initialTrust: 0, publicNotes: 'Roupas vermelhas extravagantes, óculos escuros, sobretudo vermelho. Casada com Richard Whitmore.' },
+  { id: 'thomas', gender: 'm', name: 'Thomas Reed', publicRole: 'Consultor financeiro desaparecido.', location: 'Desconhecida', initialTrust: 0, publicNotes: '38 anos. Desaparecido há onze dias em 1º de dezembro de 1992.' },
+  { id: 'richard', gender: 'm', name: 'Richard Whitmore', publicRole: 'Marido de Victoria. Credor de Jack Sullivan.', location: 'Manhattan', initialTrust: 0, publicNotes: 'Influente, com amigos na polícia.' },
+  { id: 'sal', gender: 'm', voiceNames: ['Sal'], name: 'Sal Benedetto', publicRole: 'Porteiro do prédio de Thomas Reed.', location: 'Rua 78 Leste, nº 211', initialTrust: 0, publicNotes: 'Sessenta e poucos anos, torcedor dos Knicks.' },
+  { id: 'invasores', gender: 'm', voiceNames: ['Invasor', 'Outro invasor'], name: 'Os invasores', publicRole: 'Dois homens que invadiram o apartamento de Thomas Reed.', location: 'Rua 78 Leste, nº 211', initialTrust: 0, publicNotes: 'Jaquetas de couro, vinte e poucos anos.' },
 ];
 
 export const REED_DOCUMENTS: DocumentDef[] = [
