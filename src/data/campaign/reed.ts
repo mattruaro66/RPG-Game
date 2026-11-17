@@ -20,6 +20,7 @@ export const REED_SCENES: Scene[] = [
   {
     id: 'escritorio',
     image: 'cena_escritorio',
+    phone: { flag: 'victoria_saiu' },
     title: 'Midtown, Rua 46 Oeste — fim de tarde',
     location: 'loc_escritorio',
     caseId: 'caso_reed',
@@ -27,14 +28,8 @@ export const REED_SCENES: Scene[] = [
       { text: 'O escritório de Jack Sullivan ficava no quarto andar de um prédio cansado da Rua 46 Oeste, entre uma agência de empregos e um dentista que ninguém via sair. O aquecedor estalava como se estivesse pedindo desculpas.', if: { contactIs: 'jack' } },
       { text: 'Jack olhou para a pilha de envelopes sobre a mesa. Contas. Avisos. Um deles, com papel caro demais para ser de banco, ele preferiu não abrir.', if: { contactIs: 'jack' } },
       { text: 'O escritório de Jack Sullivan ficava no quarto andar de um prédio cansado da Rua 46 Oeste. Jack tinha sumido havia dois dias, deixando a chave com {contato_completo} e um bilhete de três linhas: “Segura as pontas. Credores não abrem a porta sozinhos. Volto quando der.”', if: { contactIsNot: 'jack' } },
-      { text: 'Ray Vega estava de joelhos diante da porta, trocando a fechadura — a terceira em dois anos.', if: { all: [{ hasCharacter: 'ray' }, { contactIsNot: 'ray' }] } },
-      { text: 'Mick Donovan ocupava a cadeira mais próxima da porta, como sempre fazia em lugares com uma única saída.', if: { hasCharacter: 'mick' } },
-      { text: 'Daniel Mercer tinha vindo com Mick, direto de um plantão de trinta horas no Bellevue. Ainda não tinha contado a ninguém sobre o paciente da madrugada.', if: { all: [{ hasCharacter: 'daniel' }, { hasCharacter: 'mick' }] } },
-      { text: 'Daniel Mercer, médico do Bellevue, tinha marcado aquela conversa porque precisava de alguém que soubesse investigar sem fazer barulho. Ainda não tinha dito por quê.', if: { all: [{ hasCharacter: 'daniel' }, { notCharacter: 'mick' }] } },
-      { text: 'Liz Morgan apareceu sem avisar, com uma pasta de recortes debaixo do braço e perguntas demais para um fim de tarde.', if: { all: [{ hasCharacter: 'liz' }, { contactIsNot: 'liz' }] } },
-      { text: 'Maggie Holloway viera com Liz e folheava, encostada à estante, um livro tirado da própria bolsa.', if: { all: [{ hasCharacter: 'maggie' }, { hasCharacter: 'liz' }] } },
-      { text: 'Maggie Holloway esperava encostada à estante. Alguém lhe dissera que ali poderia haver um trabalho de pesquisa bem pago.', if: { all: [{ hasCharacter: 'maggie' }, { notCharacter: 'liz' }, { contactIsNot: 'maggie' }] } },
-      { text: 'Lá fora, a noite de dezembro já tinha engolido a cidade. Eram quase cinco da tarde.' },
+      { text: 'Lá fora, a noite de dezembro já tinha engolido a cidade. Eram quase cinco da tarde, e {contato} estava sozinho com o barulho do aquecedor e uma hora marcada com uma cliente que não quis dizer o nome ao telefone.', if: { contactIs: 'jack' } },
+      { text: 'Lá fora, a noite de dezembro já tinha engolido a cidade. Eram quase cinco da tarde. {contato} folheava a agenda de Jack: uma única anotação para hoje, às cinco e meia, sem nome. “Cliente nova. Pagar adiantado.”', if: { contactIsNot: 'jack' } },
     ],
     onEnter: [
       { type: 'case', id: 'caso_reed', status: 'ativo' },
@@ -56,19 +51,6 @@ export const REED_SCENES: Scene[] = [
           { text: 'Na gaveta de Jack, entre recibos de penhor, {contato} encontra uma nota promissória: trezentos mil dólares devidos a Richard Whitmore. Talvez isso explique o sumiço.', if: { contactIsNot: 'jack' } },
         ],
         effects: [{ type: 'clue', id: 'divida_richard' }],
-      },
-      {
-        id: 'pager_daniel', label: 'O pager de Daniel toca', kind: 'acao', once: true, timeCost: 10,
-        if: { hasCharacter: 'daniel' },
-        text: [
-          { text: 'Daniel usa o telefone do escritório. Do outro lado, uma enfermeira do Bellevue fala baixo: o prontuário do paciente da madrugada — o homem que chegou exangue, com duas pequenas perfurações perto do pescoço — não está mais no arquivo. Um homem de terno escuro esteve lá pedindo por ele mais cedo.' },
-          { text: 'Daniel desliga devagar. Não diz nada por um tempo.' },
-        ],
-        effects: [
-          { type: 'clue', id: 'prontuario_desaparecido' },
-          { type: 'case', id: 'caso_bellevue', status: 'aguardando' },
-          { type: 'objective', id: 'obj_bellevue', status: 'ativo' },
-        ],
       },
       {
         id: 'esperar_cliente', label: 'Aguardar', kind: 'esperar', once: true, timeCost: 50,
@@ -107,6 +89,8 @@ export const REED_SCENES: Scene[] = [
   {
     id: 'portaria',
     image: 'cena_portaria',
+    phone: {},
+    npcs: ['sal'],
     title: 'Rua 78 Leste, nº 211 — portaria',
     location: 'loc_predio_thomas',
     caseId: 'caso_reed',
@@ -354,6 +338,7 @@ export const REED_SCENES: Scene[] = [
   {
     id: 'invasao',
     image: 'cena_invasao',
+    npcs: ['invasores'],
     title: 'Apartamento 5C — visitantes',
     location: 'loc_apartamento',
     caseId: 'caso_reed',
@@ -428,6 +413,7 @@ export const REED_SCENES: Scene[] = [
   {
     id: 'rua',
     image: 'cena_rua',
+    phone: {},
     title: 'Rua 78 Leste — noite',
     location: 'loc_rua78',
     caseId: 'caso_reed',
@@ -447,6 +433,7 @@ export const REED_SCENES: Scene[] = [
   {
     id: 'fim_capitulo',
     image: 'cena_fim',
+    phone: {},
     title: 'Midtown — madrugada',
     location: 'loc_escritorio',
     caseId: 'caso_reed',
@@ -490,41 +477,59 @@ export const REED_DIALOGUES: Dialogue[] = [
     nodes: {
       chegada: {
         text: [
-          { text: 'A mulher que entra parece ter saído de outra década — ou de outro lugar. Vestido vermelho extravagante, sobretudo vermelho até os tornozelos, óculos escuros apesar da noite. Ela não tira as luvas de imediato.' },
-          { text: '— Disseram-me que Jack Sullivan não está. — Ela olha ao redor do escritório como quem avalia um imóvel. — Não tenho tempo para esperar por ele.', speaker: 'npc', if: { contactIsNot: 'jack' } },
-          { text: '— Meu nome é Victoria Whitmore. Preciso que encontrem um homem.', speaker: 'npc' },
+          { text: 'A mulher que entra parece ter saído de outra década — ou de outro lugar. Vestido vermelho extravagante, sobretudo vermelho até os tornozelos, óculos escuros apesar da noite. Ela não tira as luvas.' },
+          { text: 'Não se apresenta. Olha o escritório como quem avalia um imóvel que não pretende comprar, escolhe a cadeira mais distante da janela e se senta sem esperar convite.' },
+          { text: '— Disseram-me que Jack Sullivan não está. — Uma pausa. — Não tenho tempo para esperar por ele.', speaker: 'npc', if: { contactIsNot: 'jack' } },
+          { text: '— Preciso que encontre um homem.', speaker: 'npc' },
         ],
-        effects: [{ type: 'meet', npc: 'victoria' }, { type: 'objective', id: 'obj_ouvir_cliente', status: 'concluido' }, { type: 'objective', id: 'obj_decidir', status: 'ativo' }],
+        effects: [{ type: 'objective', id: 'obj_ouvir_cliente', status: 'concluido' }, { type: 'objective', id: 'obj_decidir', status: 'ativo' }],
         options: [
-          { id: 'quem', label: 'Quem é o homem?', once: true, next: 'thomas' },
-          { id: 'morto', label: 'Por que acha que ele está morto?', once: true, if: { used: 'dlg:victoria:quem' }, next: 'morto' },
-          { id: 'policia', label: 'E por que não procurou a polícia?', once: true, if: { used: 'dlg:victoria:quem' }, next: 'policia' },
+          { id: 'nome', label: 'Antes disso: com quem eu estou falando?', next: 'nome' },
+          { id: 'quem', label: 'Quem é o homem?', next: 'thomas' },
+        ],
+      },
+      conversa: {
+        // Nó de retorno: não repete nenhum texto.
+        text: [],
+        options: [
+          { id: 'nome', label: 'Com quem eu estou falando, afinal?', once: true, if: { notFlag: 'victoria_nome' }, next: 'nome' },
+          { id: 'quem', label: 'Quem é o homem?', if: { notClue: 'thomas_desaparecido' }, next: 'thomas' },
+          { id: 'morto', label: 'Por que acha que ele está morto?', once: true, if: { clue: 'thomas_desaparecido' }, next: 'morto' },
+          { id: 'policia', label: 'E por que não procurou a polícia?', once: true, if: { clue: 'thomas_desaparecido' }, next: 'policia' },
           { id: 'marido', label: 'Fale sobre o seu marido.', once: true, if: { used: 'dlg:victoria:policia' }, next: 'richard' },
-          { id: 'pagamento', label: 'E quanto ao pagamento?', once: true, if: { used: 'dlg:victoria:quem' }, next: 'pagamento' },
+          { id: 'pagamento', label: 'E quanto ao pagamento?', once: true, if: { clue: 'thomas_desaparecido' }, next: 'pagamento' },
           {
-            id: 'observar', label: '(Observar Victoria com atenção)', once: true,
-            test: { kind: 'd20', label: 'Análise Comportamental', attribute: 'raciocinio', specialty: 'analise_comportamental', altSpecialties: ['perfil_psicologico', 'psiquiatria'], tags: ['interpretar_pessoas', 'perceber_detalhes'], allowCooperation: true },
+            id: 'observar', label: '(Observar a cliente com atenção)', once: true,
+            test: { kind: 'd20', label: 'Análise Comportamental', attribute: 'raciocinio', specialty: 'analise_comportamental', altSpecialties: ['perfil_psicologico', 'psiquiatria'], tags: ['interpretar_pessoas', 'perceber_detalhes'] },
             outcomes: {
               critico: {
                 text: [
-                  { text: 'Ela não tira os óculos escuros em momento algum, nem quando a luz do abajur bate direto em seu rosto. Fala de Thomas no passado sem perceber. Quando aperta sua mão, a pele está fria — mas o escritório está aquecido há horas.' },
-                  { text: 'E há outra coisa: ela não está mentindo sobre amar Thomas. Está mentindo sobre outra coisa. Sobre o motivo de ter vindo justamente aqui.' },
+                  { text: 'Ela não tira os óculos escuros em momento algum, nem quando a luz do abajur bate direto em seu rosto. Fala de Thomas no passado sem perceber. As mãos, quando enfim tira uma das luvas, estão frias — mas o escritório está aquecido há horas.' },
+                  { text: 'E há outra coisa: ela não mente sobre amar Thomas. Mente sobre outra coisa. Sobre o motivo de ter vindo justamente até aqui.' },
                 ],
                 effects: [{ type: 'clue', id: 'victoria_observada', extra: 'Ela não mente sobre amar Thomas; mente sobre o motivo de ter vindo até aqui.' }],
               },
               sucesso: {
-                text: [{ text: 'Ela não tira os óculos escuros em momento algum, nem quando a luz do abajur bate direto em seu rosto. Fala de Thomas no passado sem perceber. Quando aperta sua mão, a pele está fria — mas o escritório está aquecido há horas.' }],
+                text: [{ text: 'Ela não tira os óculos escuros em momento algum, nem quando a luz do abajur bate direto em seu rosto. Fala de Thomas no passado sem perceber. As mãos, quando enfim tira uma das luvas, estão frias — mas o escritório está aquecido há horas.' }],
                 effects: [{ type: 'clue', id: 'victoria_observada' }],
               },
               falha: {
-                text: [{ text: '— Está me examinando ou me ouvindo? — Victoria inclina a cabeça. Atrás das lentes escuras, nada se deixa ler.', speaker: 'Victoria Whitmore' }],
+                text: [{ text: '— Está me examinando ou me ouvindo? — Ela inclina a cabeça. Atrás das lentes escuras, nada se deixa ler.', speaker: 'npc' }],
                 effects: [{ type: 'trust', npc: 'victoria', delta: -1 }],
               },
             },
           },
-          { id: 'aceitar', label: 'Aceitamos o caso.', if: { used: 'dlg:victoria:quem' }, next: 'aceite' },
-          { id: 'recusar', label: 'Sinto muito. Não podemos aceitar.', if: { used: 'dlg:victoria:quem' }, next: 'recusa' },
+          { id: 'aceitar', label: 'Aceito o caso.', if: { clue: 'thomas_desaparecido' }, next: 'aceite' },
+          { id: 'recusar', label: 'Sinto muito. Não posso aceitar.', if: { clue: 'thomas_desaparecido' }, next: 'recusa' },
         ],
+      },
+      nome: {
+        text: [
+          { text: 'Ela demora um instante, como quem decide se a pergunta merece resposta.' },
+          { text: '— Victoria. — Outra pausa, mais curta. — Victoria Whitmore. O sobrenome talvez lhe diga alguma coisa. Preferiria que não dissesse.', speaker: 'npc' },
+        ],
+        effects: [{ type: 'meet', npc: 'victoria' }, { type: 'flag', key: 'victoria_nome' }],
+        options: [{ id: 'voltar', label: '(Continuar)', next: 'conversa' }],
       },
       thomas: {
         text: [
@@ -532,13 +537,13 @@ export const REED_DIALOGUES: Dialogue[] = [
           { text: '— Ele é meu amante. Não vou fingir o contrário, não temos tempo para isso. — A voz não treme. — E eu acredito que ele esteja morto.', speaker: 'npc' },
         ],
         effects: [{ type: 'clue', id: 'thomas_desaparecido' }, { type: 'meet', npc: 'thomas' }],
-        options: [{ id: 'voltar', label: '(Continuar)', next: 'chegada' }],
+        options: [{ id: 'voltar', label: '(Continuar)', next: 'conversa' }],
       },
       morto: {
         text: [
-          { text: '— Porque em dois anos ele nunca passou um dia sem me telefonar. Nem um. — Ela finalmente tira as luvas, dedo por dedo. — E porque eu sinto. Você pode chamar isso do que quiser.', speaker: 'npc' },
+          { text: '— Porque em dois anos ele nunca passou um dia sem me telefonar. Nem um. — Ela finalmente tira uma das luvas, dedo por dedo. — E porque eu sinto. Pode chamar isso do que quiser.', speaker: 'npc' },
         ],
-        options: [{ id: 'voltar', label: '(Continuar)', next: 'chegada' }],
+        options: [{ id: 'voltar', label: '(Continuar)', next: 'conversa' }],
       },
       policia: {
         // CANÔNICO: diálogo preservado integralmente.
@@ -550,34 +555,37 @@ export const REED_DIALOGUES: Dialogue[] = [
           { text: '{contato} ergueu as sobrancelhas, esperando uma confissão mais detalhada.', if: { contactIsNot: 'jack' } },
           { text: '— Meu marido tem amigos na polícia. Amigos em lugares que você provavelmente nem imagina. Se ele descobrir sobre Thomas, não haverá investigação alguma. E, se descobrir que estou procurando por ele, terei problemas muito maiores.', speaker: 'npc' },
         ],
-        effects: [{ type: 'clue', id: 'richard_influencia' }, { type: 'meet', npc: 'richard' }],
-        options: [{ id: 'voltar', label: '(Continuar)', next: 'chegada' }],
+        effects: [{ type: 'clue', id: 'richard_influencia' }, { type: 'meet', npc: 'richard' }, { type: 'meet', npc: 'victoria' }],
+        options: [{ id: 'voltar', label: '(Continuar)', next: 'conversa' }],
       },
       richard: {
         text: [
-          { text: '— Richard Whitmore. Investimentos, imóveis, um assento em conselhos que você nunca ouviu falar. — Ela olha direto para Jack. — E empresta dinheiro a homens desesperados. Sei o que meu marido empresta, e a quem.', speaker: 'npc', if: { contactIs: 'jack' } },
+          { text: '— Richard Whitmore. Investimentos, imóveis, um assento em conselhos de que você nunca ouviu falar. — Ela olha direto para Jack. — E empresta dinheiro a homens desesperados. Sei o que meu marido empresta, e a quem.', speaker: 'npc', if: { contactIs: 'jack' } },
           { text: 'Jack sente o estômago afundar. Trezentos mil dólares. Ela sabe.', if: { contactIs: 'jack' } },
-          { text: '— Richard Whitmore. Investimentos, imóveis, um assento em conselhos que vocês nunca ouviram falar. E empresta dinheiro a homens desesperados. — Uma pausa. — Jack Sullivan é um deles. Talvez por isso ele não esteja aqui.', speaker: 'npc', if: { contactIsNot: 'jack' } },
+          { text: '— Richard Whitmore. Investimentos, imóveis, um assento em conselhos de que você nunca ouviu falar. E empresta dinheiro a homens desesperados. — Uma pausa. — Jack Sullivan é um deles. Talvez por isso ele não esteja aqui.', speaker: 'npc', if: { contactIsNot: 'jack' } },
         ],
-        effects: [{ type: 'clue', id: 'divida_richard', extra: 'Victoria sabe da dívida de Jack com Richard.' }],
-        options: [{ id: 'voltar', label: '(Continuar)', next: 'chegada' }],
+        effects: [{ type: 'clue', id: 'divida_richard', extra: 'Victoria sabe da dívida de Jack com Richard.' }, { type: 'meet', npc: 'victoria' }],
+        options: [{ id: 'voltar', label: '(Continuar)', next: 'conversa' }],
       },
       pagamento: {
         text: [
           { text: '— Dois milhões de dólares. — Ela diz o número como quem comenta o tempo. — Metade quando me disserem o que aconteceu com ele. A outra metade quando eu tiver certeza.', speaker: 'npc' },
-          { text: 'Jack faz as contas sem querer. Dois milhões pagam Richard Whitmore seis vezes.', if: { contactIs: 'jack' } },
+          { text: 'Jack faz as contas sem querer. Dois milhões pagam a dívida com Richard Whitmore seis vezes.', if: { contactIs: 'jack' } },
         ],
         effects: [{ type: 'flag', key: 'oferta_conhecida' }],
-        options: [{ id: 'voltar', label: '(Continuar)', next: 'chegada' }],
+        options: [{ id: 'voltar', label: '(Continuar)', next: 'conversa' }],
       },
       aceite: {
         text: [
-          { text: 'Victoria assente uma vez, como se nunca tivesse duvidado.' },
-          { text: '— Ele morava na Rua 78 Leste, número 211, apartamento 5C. — Ela coloca sobre a mesa uma chave, uma fotografia e um cartão cor de vinho. — O porteiro se chama Sal. É discreto. Não confiem em ninguém que diga trabalhar para mim.', speaker: 'npc' },
-          { text: 'Quando ela sai, o corredor fica frio por um tempo que ninguém comenta.' },
+          { text: 'Ela assente uma vez, como se nunca tivesse duvidado.' },
+          { text: '— Ele morava na Rua 78 Leste, número 211, apartamento 5C. — Ela coloca sobre a mesa uma chave, uma fotografia e um cartão cor de vinho. — O porteiro se chama Sal. É discreto. Não confie em ninguém que diga trabalhar para mim.', speaker: 'npc' },
+          { text: 'No cartão, apenas um nome e um telefone: Victoria Whitmore.', if: { notFlag: 'victoria_nome' } },
+          { text: 'Quando ela sai, o corredor fica frio por um tempo que ninguém comenta. O telefone sobre a mesa parece maior agora — talvez seja hora de chamar reforços.' },
         ],
         effects: [
+          { type: 'meet', npc: 'victoria' },
           { type: 'flag', key: 'caso_aceito' },
+          { type: 'flag', key: 'victoria_saiu' },
           { type: 'decision', id: 'aceitou_caso', label: 'Aceitou o caso de Victoria Whitmore.' },
           { type: 'trust', npc: 'victoria', delta: 1 },
           { type: 'item', itemId: 'chave_apartamento' },
@@ -593,12 +601,15 @@ export const REED_DIALOGUES: Dialogue[] = [
       },
       recusa: {
         text: [
-          { text: 'Victoria não discute. Coloca um cartão cor de vinho sobre a mesa.' },
-          { text: '— Thomas morava na Rua 78 Leste, número 211. Se mudarem de ideia, já sabem por onde começar. E onde me encontrar.', speaker: 'npc' },
+          { text: 'Ela não discute. Coloca um cartão cor de vinho sobre a mesa.' },
+          { text: '— Thomas morava na Rua 78 Leste, número 211. Se mudar de ideia, já sabe por onde começar. E onde me encontrar.', speaker: 'npc' },
+          { text: 'No cartão, apenas um nome e um telefone: Victoria Whitmore.', if: { notFlag: 'victoria_nome' } },
           { text: 'Quando ela sai, o corredor fica frio por um tempo que ninguém comenta.' },
         ],
         effects: [
+          { type: 'meet', npc: 'victoria' },
           { type: 'flag', key: 'caso_recusado' },
+          { type: 'flag', key: 'victoria_saiu' },
           { type: 'decision', id: 'recusou_caso', label: 'Recusou o caso de Victoria Whitmore.' },
           { type: 'trust', npc: 'victoria', delta: -2 },
           { type: 'item', itemId: 'cartao_victoria' },
@@ -623,9 +634,59 @@ export const REED_DIALOGUES: Dialogue[] = [
       },
       reed: {
         text: [
-          { text: '— O senhor Reed? Faz uns dias que não vejo. Viajou, acho. — Ele desvia o olhar para a televisão um segundo rápido demais.', speaker: 'npc', if: { notFlag: 'sal_contou' } },
-          { text: '— Já contei o que sei. — Sal suspira. — Tomem cuidado lá em cima.', speaker: 'npc', if: { flag: 'sal_contou' } },
+          { text: '— O senhor Reed? Faz uns dias que não vejo. Viajou, acho. — Ele desvia o olhar para a televisão um segundo rápido demais.', speaker: 'npc', if: { all: [{ notFlag: 'sal_contou' }, { notFlag: 'sal_perguntado' }] } },
+          { text: '— Já contei o que sei. — Sal suspira. — Tomem cuidado lá em cima.', speaker: 'npc', if: { all: [{ flag: 'sal_contou' }] } },
         ],
+        effects: [{ type: 'flag', key: 'sal_perguntado' }],
+        options: [
+          {
+            id: 'persuadir', label: 'Ninguém aqui quer te criar problema, Sal. Só queremos saber o que aconteceu com ele.', once: true,
+            if: { notFlag: 'sal_contou' },
+            test: { kind: 'd20', label: 'Persuasão', attribute: 'presenca', specialty: 'persuasao', altSpecialties: ['entrevistas', 'fontes_contatos', 'interrogatorio'], tags: ['persuasao', 'argumentacao', 'empatia'], allowCooperation: true },
+            outcomes: {
+              critico: {
+                text: [
+                  { text: '— Olha... não quero encrenca. Três noites atrás vieram dois sujeitos dizendo que eram da seguradora. Seguradora não vem às onze da noite. Subiram, ficaram meia hora, saíram com uma caixa de arquivo.', speaker: 'Sal' },
+                  { text: '— E tem outra coisa. Na noite em que o senhor Reed sumiu, ele saiu tarde, sozinho, sem casaco. Num frio daqueles. Como quem vai só até a esquina e volta.', speaker: 'Sal' },
+                ],
+                effects: [{ type: 'clue', id: 'visitantes_apartamento', extra: 'Na noite do desaparecimento, Thomas saiu tarde, sozinho e sem casaco.' }, { type: 'trust', npc: 'sal', delta: 1 }, { type: 'flag', key: 'sal_contou' }],
+              },
+              sucesso: {
+                text: [{ text: '— Olha... não quero encrenca. Três noites atrás vieram dois sujeitos dizendo que eram da seguradora. Seguradora não vem às onze da noite. Subiram, ficaram meia hora, saíram com uma caixa de arquivo.', speaker: 'Sal' }],
+                effects: [{ type: 'clue', id: 'visitantes_apartamento' }, { type: 'trust', npc: 'sal', delta: 1 }, { type: 'flag', key: 'sal_contou' }],
+              },
+              falha: {
+                text: [{ text: '— Eu já disse o que sei. Vocês querem que eu chame alguém?', speaker: 'Sal' }],
+                effects: [{ type: 'trust', npc: 'sal', delta: -1 }, { type: 'flag', key: 'sal_desconfiado' }],
+              },
+            },
+          },
+          {
+            id: 'pressionar', label: 'Você vai falar agora, ou vai falar com a polícia depois.', once: true,
+            if: { notFlag: 'sal_contou' },
+            test: { kind: 'd20', label: 'Interrogatório', attribute: 'presenca', specialty: 'interrogatorio', altSpecialties: ['manipulacao'], tags: ['autoridade', 'impacto_social'] },
+            outcomes: {
+              sucesso: {
+                text: [{ text: 'Sal engole em seco. — Tá bom, tá bom. Três noites atrás, dois sujeitos da “seguradora”. Às onze da noite. Saíram com uma caixa. Satisfeitos?', speaker: 'Sal' }],
+                effects: [{ type: 'clue', id: 'visitantes_apartamento' }, { type: 'trust', npc: 'sal', delta: -1 }, { type: 'flag', key: 'sal_contou' }],
+              },
+              falha: {
+                text: [{ text: 'Sal pega o telefone. — Engraçado. Vamos ver o que a polícia acha de vocês.', speaker: 'Sal' }],
+                effects: [{ type: 'trust', npc: 'sal', delta: -2 }, { type: 'flag', key: 'sal_chamou_policia' }, { type: 'track', track: 'risco_protagonistas', delta: 2 }, { type: 'attention', faction: 'policia', delta: 1 }, { type: 'event', text: 'O porteiro do prédio de Thomas Reed chamou a polícia por causa do grupo.' }],
+              },
+            },
+          },
+          {
+            id: 'foto', label: '(Mostrar a fotografia de Thomas)', once: true,
+            if: { hasItem: 'foto_thomas' },
+            effects: [{ type: 'trust', npc: 'sal', delta: 1 }],
+            next: 'foto',
+          },
+          { id: 'voltar', label: 'Obrigado, Sal.', next: null },
+        ],
+      },
+      perguntas: {
+        text: [],
         options: [
           {
             id: 'persuadir', label: 'Ninguém aqui quer te criar problema, Sal. Só queremos saber o que aconteceu com ele.', once: true,
@@ -675,7 +736,7 @@ export const REED_DIALOGUES: Dialogue[] = [
       },
       foto: {
         text: [{ text: '— É ele, sim. Gente boa. Sempre deixava gorjeta no Natal. — Sal devolve a foto com cuidado. — Esse ano eu não sei, né.', speaker: 'npc' }],
-        options: [{ id: 'voltar', label: '(Continuar)', next: 'reed' }],
+        options: [{ id: 'voltar', label: '(Continuar)', next: 'perguntas' }],
       },
     },
   },
@@ -727,7 +788,7 @@ export const REED_ENCOUNTERS: EncounterDef[] = [
 // ---------------------------------------------------------------------------
 
 export const REED_CLUES: ClueDef[] = [
-  { id: 'thomas_desaparecido', image: 'npc_thomas', caseId: 'caso_reed', importance: 'essencial', title: 'Thomas Reed desapareceu', description: 'Thomas Reed, 38 anos, consultor financeiro, desapareceu há onze dias. É amante de Victoria Whitmore, que acredita que ele esteja morto.', location: 'loc_escritorio', characters: ['victoria', 'thomas'], related: ['endereco_thomas'], memoryDetail: 'Victoria se referiu a Thomas no passado duas vezes antes de dizer que acreditava que ele estivesse morto.' },
+  { id: 'thomas_desaparecido', image: 'npc_thomas', caseId: 'caso_reed', importance: 'essencial', title: 'Thomas Reed desapareceu', description: 'Thomas Reed, 38 anos, consultor financeiro, desapareceu há onze dias. É amante da cliente, que acredita que ele esteja morto.', location: 'loc_escritorio', characters: ['victoria', 'thomas'], related: ['endereco_thomas'], memoryDetail: 'A cliente se referiu a Thomas no passado duas vezes antes de dizer que acreditava que ele estivesse morto.' },
   { id: 'endereco_thomas', caseId: 'caso_reed', importance: 'essencial', title: 'Endereço de Thomas Reed', description: 'Rua 78 Leste, nº 211, apartamento 5C, Upper East Side. O porteiro se chama Sal.', location: 'loc_escritorio', characters: ['victoria', 'sal'], related: ['thomas_desaparecido'] },
   { id: 'richard_influencia', caseId: 'caso_reed', importance: 'importante', title: 'Os amigos de Richard Whitmore', description: 'Segundo Victoria, o marido tem amigos na polícia e “em lugares que você provavelmente nem imagina”. Ela não pode procurar a polícia.', location: 'loc_escritorio', characters: ['victoria', 'richard'], related: ['divida_richard'] },
   { id: 'divida_richard', image: 'obj_promissoria', caseId: 'caso_reed', importance: 'importante', title: 'A dívida de Jack', description: 'Jack Sullivan deve trezentos mil dólares a Richard Whitmore.', location: 'loc_escritorio', characters: ['richard'], related: ['richard_influencia', 'documentos_halcyon'] },
@@ -751,7 +812,7 @@ export const REED_CLUES: ClueDef[] = [
 ];
 
 export const REED_NPCS: NpcDef[] = [
-  { id: 'victoria', name: 'Victoria Whitmore', publicRole: 'Cliente. Procura Thomas Reed, seu amante.', location: 'Desconhecida', initialTrust: 0, publicNotes: 'Roupas vermelhas extravagantes, óculos escuros, sobretudo vermelho. Casada com Richard Whitmore.' },
+  { id: 'victoria', name: 'Victoria Whitmore', alias: 'A mulher de vermelho', publicRole: 'Cliente. Procura Thomas Reed, seu amante.', location: 'Desconhecida', initialTrust: 0, publicNotes: 'Roupas vermelhas extravagantes, óculos escuros, sobretudo vermelho. Casada com Richard Whitmore.' },
   { id: 'thomas', name: 'Thomas Reed', publicRole: 'Consultor financeiro desaparecido.', location: 'Desconhecida', initialTrust: 0, publicNotes: '38 anos. Desaparecido há onze dias em 1º de dezembro de 1992.' },
   { id: 'richard', name: 'Richard Whitmore', publicRole: 'Marido de Victoria. Credor de Jack Sullivan.', location: 'Manhattan', initialTrust: 0, publicNotes: 'Influente, com amigos na polícia.' },
   { id: 'sal', name: 'Sal Benedetto', publicRole: 'Porteiro do prédio de Thomas Reed.', location: 'Rua 78 Leste, nº 211', initialTrust: 0, publicNotes: 'Sessenta e poucos anos, torcedor dos Knicks.' },
@@ -768,7 +829,7 @@ export const REED_DOCUMENTS: DocumentDef[] = [
 
 export const REED_OBJECTIVES: ObjectiveDef[] = [
   { id: 'obj_ouvir_cliente', caseId: 'caso_reed', text: 'Receber a cliente que marcou hora para o fim da tarde.' },
-  { id: 'obj_decidir', caseId: 'caso_reed', text: 'Decidir se aceitam o caso de Victoria Whitmore.' },
+  { id: 'obj_decidir', caseId: 'caso_reed', text: 'Decidir se aceita o caso da cliente.' },
   { id: 'obj_encontrar_thomas', caseId: 'caso_reed', text: 'Descobrir o que aconteceu com Thomas Reed.' },
   { id: 'obj_apartamento', caseId: 'caso_reed', text: 'Investigar o apartamento de Thomas Reed, na Rua 78 Leste.' },
   { id: 'obj_nocturne', caseId: 'caso_reed', text: 'Descobrir o que é o Nocturne, na Ludlow Street.' },

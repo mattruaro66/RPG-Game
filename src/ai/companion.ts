@@ -11,6 +11,7 @@ import { canTreat, TREATMENTS } from '../engine/medical';
 import { canAct, isPlayable } from '../engine/sanity';
 import type { GameState } from '../engine/state';
 import type { CharacterId, Dice } from '../engine/types';
+import { activeParty } from '../engine/narrative/conditions';
 
 function chance(dice: Dice, p: number): boolean {
   return dice.d20() <= Math.round(p * 20);
@@ -35,7 +36,7 @@ export function chooseCompanionAction(s: GameState, id: CharacterId, dice: Dice)
   const treatSpecs = me.specialties.filter((sp) => TREATMENTS[sp]);
   if (treatSpecs.length && p.care >= 0.5) {
     const wounded = s.party
-      .filter((c) => c.status !== 'morto' && c.hp <= 10 && !cb.combatants[c.id]?.fled)
+      .filter((c) => c.status !== 'morto' && c.hp <= 10 && cb.combatants[c.id] && !cb.combatants[c.id].fled)
       .sort((a, b) => a.hp - b.hp);
     for (const w of wounded) {
       const spec = treatSpecs.find((sp) => canTreat(me, w, sp).ok);
@@ -72,7 +73,7 @@ export function suggestHelpers(s: GameState, actorId: string): CharacterId[] {
 
 /** Fala de um companheiro controlado pela IA para uma situação. */
 export function companionLine(s: GameState, trigger: CompanionTrigger, dice: Dice, exclude?: CharacterId): { speaker: string; text: string } | null {
-  const candidates = s.party.filter((c) => c.control === 'ia' && isPlayable(c) && canAct(c) && c.id !== exclude && CHARACTER_BY_ID[c.id].ai.lines[trigger]?.length);
+  const candidates = activeParty(s).filter((c) => c.control === 'ia' && isPlayable(c) && canAct(c) && c.id !== exclude && CHARACTER_BY_ID[c.id].ai.lines[trigger]?.length);
   if (!candidates.length) return null;
   const who = candidates[(dice.d20() - 1) % candidates.length];
   const lines = CHARACTER_BY_ID[who.id].ai.lines[trigger]!;

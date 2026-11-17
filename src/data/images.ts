@@ -26,6 +26,8 @@ export interface ImageSlot {
   title: string;
   caption: string;
   prompt: string;
+  /** NPC retratado: a legenda usa o nome que o grupo conhece. */
+  npc?: string;
   /** Mantém a cor (ex.: o vermelho de Victoria); as demais viram preto e branco. */
   keepColor?: boolean;
   bundled?: BundledImage;
@@ -62,8 +64,8 @@ export const IMAGE_SLOTS: ImageSlot[] = [
   slot('loc_metro', 'local', 'Metrô, linha N', 'O último trem da noite.', 'New York subway platform late at night, an old silver N train arriving, flickering fluorescent lights, empty platform', archive('loc_metro', 'Alex Lozupone', 'CC BY 4.0', 'https://commons.wikimedia.org/wiki/File:Downfolders-downfolder29-2011_01_31_12_56_15.jpg')),
 
   // NPCs
-  slot('npc_victoria', 'npc', 'Victoria Whitmore', 'A cliente.', 'portrait of an elegant woman in her thirties wearing an extravagant red dress, a long red overcoat to the ankles, dark sunglasses at night and leather gloves, standing in a dark office doorway, unreadable expression', { keepColor: true }),
-  slot('npc_sal', 'npc', 'Sal Benedetto', 'O porteiro.', 'portrait of a 60-year-old doorman in a uniform with brass buttons and a cap, sitting behind a lobby desk, tired kind eyes, small TV glow on his face'),
+  slot('npc_victoria', 'npc', 'Victoria Whitmore', 'A cliente.', 'portrait of an elegant woman in her thirties wearing an extravagant red dress, a long red overcoat to the ankles, dark sunglasses at night and leather gloves, standing in a dark office doorway, unreadable expression', { keepColor: true, npc: 'victoria' }),
+  slot('npc_sal', 'npc', 'Sal Benedetto', 'O porteiro.', 'portrait of a 60-year-old doorman in a uniform with brass buttons and a cap, sitting behind a lobby desk, tired kind eyes, small TV glow on his face', { npc: 'sal' }),
   slot('npc_thomas', 'npc', 'Thomas Reed', 'Retrato de estúdio, outubro de 1991.', 'studio portrait of a 38-year-old financial consultant in a grey suit and wine-colored tie, practiced confident smile, 1991 corporate headshot'),
   slot('npc_invasores', 'npc', 'Os invasores', 'Dois homens de jaqueta de couro.', 'two young street criminals in leather jackets in a stairwell, one with a knife on his belt, the other with a hand hidden inside his jacket, nervous eyes'),
 

@@ -3,6 +3,8 @@ import { CHARACTER_BY_ID, shortName } from '../data/characters';
 import { specialtyName } from '../data/specialties';
 import { describeTest } from '../engine/checks';
 import { content } from '../engine/narrative/registry';
+import { activeParty } from '../engine/narrative/conditions';
+import { npcDisplayName } from '../engine/narrative/effects';
 import { currentDialogueNode, defaultActor, previewTest, visibleInteractions, visibleOptions } from '../engine/narrative/scene';
 import type { Interaction, TestSpec } from '../engine/narrative/types';
 import { canAct } from '../engine/sanity';
@@ -30,7 +32,7 @@ interface PendingChoice {
 }
 
 function TestPicker({ game, choice, onCancel }: { game: GameState; choice: PendingChoice; onCancel: () => void }) {
-  const able = game.party.filter(canAct);
+  const able = activeParty(game).filter(canAct);
   const suggested = defaultActor(game, choice.spec);
   const [actor, setActor] = useState<CharacterId | undefined>(suggested);
   const [helpers, setHelpers] = useState<CharacterId[]>([]);
@@ -119,7 +121,7 @@ export function Actions({ game }: { game: GameState }) {
     const opts = visibleOptions(game);
     return (
       <div className="actions">
-        <h3 className="actions-title">Conversa com {dlg.npc?.name}</h3>
+        <h3 className="actions-title">Conversa com {npcDisplayName(game, dlg.dialogue.npc)}</h3>
         <div className="option-list">
           {opts.map((o) => (
             <button

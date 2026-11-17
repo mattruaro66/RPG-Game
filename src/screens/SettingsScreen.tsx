@@ -41,8 +41,14 @@ export function SettingsScreen() {
               <option value={1.15}>Rápida</option>
             </select>
           </label>
+          <fieldset className="casting">
+            <legend>Quem fala</legend>
+            <label className="radio"><input type="radio" name="casting" checked={settings.voiceCasting === 'narrador'} onChange={() => setSettings({ ...settings, voiceCasting: 'narrador' })} /> Um narrador lê tudo, inclusive os diálogos (como um audiolivro)</label>
+            <label className="radio"><input type="radio" name="casting" checked={settings.voiceCasting === 'personagens'} onChange={() => setSettings({ ...settings, voiceCasting: 'personagens' })} /> Cada personagem com a sua voz</label>
+          </fieldset>
+          <p className="small muted">Há apenas quatro vozes, sem indicação de timbre. Use “Testar” para ouvir cada uma e escolha a que combina com cada personagem.</p>
           <div className="voice-grid">
-            {VOICE_ROLES.map((r) => (
+            {VOICE_ROLES.filter((r) => settings.voiceCasting === 'personagens' || r.key === 'narrador').map((r) => (
               <label key={r.key} className="field">{r.label}
                 <span className="row tight">
                   <select id={`voice-${r.key}`} value={settings.voices[r.key] ?? 'rounded'} onChange={(e) => setSettings({ ...settings, voices: { ...settings.voices, [r.key]: e.target.value as Voice } })}>

@@ -178,5 +178,7 @@ export interface GameState {
   gameOver: null | { reason: string };
   /** Imagem em foco na tela (slot em data/images). */
   visual?: string;
+  /** Protagonistas presentes na cena atual (os demais estão em outro lugar). */
+  present?: CharacterId[];
   lastTier?: Tier;
 }

@@ -22,19 +22,20 @@ describe('Resposta livre', () => {
     expect(r.actionId).toBeNull();
     const after = freeText(s, 'Danço tango sozinho', r);
     expect(after.journal.clues).toEqual(s.journal.clues);
-    expect(after.narrative.at(-1)?.speaker).toBe('Narrador');
+    expect(after.narrative.at(-1)?.kind).toBe('texto');
+    expect(after.narrative.at(-1)?.text).toContain('não entendeu');
   });
 
   it('com correspondência, o motor executa a ação e registra a fala do jogador', () => {
     const s = start();
-    const after = freeText(s, 'Vou dar uma olhada no jornal', { actionId: 'jornal', actorId: 'liz', narration: null, via: 'claude' });
+    const after = freeText(s, 'Vou dar uma olhada no jornal', { actionId: 'jornal', actorId: 'liz', narration: null, via: 'claude', lines: [], test: null, trust: null, minutes: 5 });
     expect(after.journal.clues.some((c) => c.id === 'noticia_corpos')).toBe(true);
     expect(after.narrative.some((e) => e.kind === 'fala' && e.text === 'Vou dar uma olhada no jornal' && e.speaker === 'Liz')).toBe(true);
   });
 
   it('no diálogo, a fala livre substitui o rótulo da opção', () => {
     let s = interact(start(), 'esperar_cliente');
-    s = freeText(s, 'Quem a senhora procura, afinal?', { actionId: 'quem', actorId: null, narration: null, via: 'claude' });
+    s = freeText(s, 'Quem a senhora procura, afinal?', { actionId: 'quem', actorId: null, narration: null, via: 'claude', lines: [], test: null, trust: null, minutes: 5 });
     expect(s.journal.clues.some((c) => c.id === 'thomas_desaparecido')).toBe(true);
     expect(s.narrative.some((e) => e.text === 'Quem a senhora procura, afinal?')).toBe(true);
     expect(s.narrative.some((e) => e.kind === 'fala' && e.text === 'Quem é o homem?')).toBe(false);
@@ -66,11 +67,9 @@ describe('Resposta livre', () => {
   });
 
   it('um erro qualquer do Claude cai no interpretador local', async () => {
-    const failing = Object.assign(async () => ({ text: '', truncated: false }), {
-      json: async () => {
-        throw { code: 'upstream_error', message: 'x' };
-      },
-    });
+    const failing = Object.assign(async () => {
+      throw { code: 'upstream_error', message: 'x' };
+    }, { json: async () => ({}) });
     const r = await interpret(failing as never, start(), 'examinar o jornal', null);
     expect(r.via).toBe('local');
   });

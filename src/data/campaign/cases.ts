@@ -9,7 +9,7 @@ export const CASES: CaseDef[] = [
   {
     id: 'caso_reed',
     title: 'O desaparecimento de Thomas Reed',
-    summary: 'Victoria Whitmore quer encontrar o amante, desaparecido há onze dias. Ela acredita que ele está morto e não pode procurar a polícia.',
+    summary: 'Uma cliente de vermelho quer encontrar o amante, desaparecido há onze dias. Ela acredita que ele está morto e não pode procurar a polícia.',
     centralCharacter: 'jack',
   },
   {

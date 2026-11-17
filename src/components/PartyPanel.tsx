@@ -4,6 +4,8 @@ import type { GameState } from '../engine/state';
 import type { CharacterId } from '../engine/types';
 import { PROFESSION_LABELS } from '../engine/types';
 import { Bar, Portrait, Tag } from './ui';
+import { isPresent } from '../engine/narrative/conditions';
+import { content } from '../engine/narrative/registry';
 
 export function statusLabel(c: GameState['party'][number]): { text: string; tone: 'ok' | 'warn' | 'wine' | 'muted' } {
   if (c.status === 'morto') return { text: 'Morto', tone: 'muted' };
@@ -20,9 +22,10 @@ export function PartyPanel({ game, onOpen, activeId }: { game: GameState; onOpen
       {game.party.map((c) => {
         const def = CHARACTER_BY_ID[c.id];
         const st = statusLabel(c);
+        const here = isPresent(game, c.id);
         return (
-          <button key={c.id} className={`party-card${activeId === c.id ? ' active' : ''}${!isPlayable(c) ? ' out' : ''}`} onClick={() => onOpen(c.id)}>
-            <Portrait id={c.id} size={44} dim={!isPlayable(c)} />
+          <button key={c.id} className={`party-card${activeId === c.id ? ' active' : ''}${!isPlayable(c) ? ' out' : ''}${!here ? ' away' : ''}`} onClick={() => onOpen(c.id)}>
+            <Portrait id={c.id} size={44} dim={!isPlayable(c) || !here} />
             <div className="party-info">
               <div className="party-name">
                 <strong>{shortName(def)}</strong>
@@ -32,6 +35,7 @@ export function PartyPanel({ game, onOpen, activeId }: { game: GameState; onOpen
               <Bar value={c.hp} max={c.maxHp} kind="hp" label={`PV ${c.hp}/${c.maxHp}`} />
               <Bar value={c.sanity} max={10} kind="san" label={`Sanidade ${c.sanity}/10`} />
               <Tag tone={st.tone}>{st.text}</Tag>
+              {!here && isPlayable(c) && <Tag tone="muted" title="Fora da cena. Pode ser chamado por telefone.">Ausente · {content().calls[c.id]?.whereabouts ?? 'em outro lugar'}</Tag>}
             </div>
           </button>
         );

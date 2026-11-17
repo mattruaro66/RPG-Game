@@ -6,6 +6,7 @@ import { capacity, LOCATION_LABELS, usedSlots } from '../engine/inventory';
 import { canProvidePsychiatricHelp, canRecoverToday, isPlayable } from '../engine/sanity';
 import { canTreat, TREATMENTS } from '../engine/medical';
 import { content } from '../engine/narrative/registry';
+import { activeParty } from '../engine/narrative/conditions';
 import { TRACK_LABELS, type GameState, type TrackId } from '../engine/state';
 import { dayIndex, formatClock, formatDate, formatDateTime } from '../engine/time';
 import type { CharacterId } from '../engine/types';
@@ -152,7 +153,7 @@ function Objectives({ game }: { game: GameState }) {
 function InventoryTab({ game }: { game: GameState }) {
   const { update } = useGame();
   const ground = game.groundItems[game.sceneId] ?? [];
-  const able = game.party.filter(isPlayable);
+  const able = activeParty(game);
   return (
     <div>
       {game.party.map((c) => (
@@ -185,10 +186,11 @@ function InventoryTab({ game }: { game: GameState }) {
 function CareTab({ game }: { game: GameState }) {
   const { update } = useGame();
   const day = dayIndex(game.time);
-  const healers = game.party.filter((c) => c.status === 'ativo' && c.sanity > 0);
+  const here = activeParty(game);
+  const healers = here.filter((c) => c.status === 'ativo' && c.sanity > 0);
   const [healer, setHealer] = useState<CharacterId | ''>(healers.find((h) => h.specialties.some((s) => TREATMENTS[s]))?.id ?? healers[0]?.id ?? '');
   const h = game.party.find((c) => c.id === healer);
-  const doctors = game.party.filter((c) => c.specialties.includes('psiquiatria'));
+  const doctors = here.filter((c) => c.specialties.includes('psiquiatria'));
   if (game.combat) return <p className="muted">Durante o combate, use as ações de combate.</p>;
   return (
     <div>
@@ -202,7 +204,7 @@ function CareTab({ game }: { game: GameState }) {
         <div key={sp} className="care-row">
           <span className="small">{TREATMENTS[sp].label}{!h.specialties.includes(sp) && <span className="muted"> (sem especialidade)</span>}</span>
           <div className="row wrap">
-            {game.party.filter((t) => t.status !== 'morto' && t.hp < t.maxHp).map((t) => {
+            {here.filter((t) => t.status !== 'morto' && t.hp < t.maxHp).map((t) => {
               const ok = canTreat(h, t, sp);
               return <button key={t.id} className="btn-small" disabled={!ok.ok} title={ok.reason} onClick={() => update((s) => treatOutOfCombat(s, h.id, t.id, sp))}>{shortName(CHARACTER_BY_ID[t.id])} ({t.hp} PV)</button>;
             })}
@@ -230,7 +232,7 @@ function CareTab({ game }: { game: GameState }) {
               <div key={d.id}>
                 {!can.ok && <p className="muted small">{shortName(CHARACTER_BY_ID[d.id])}: {can.reason}</p>}
                 <div className="row wrap">
-                  {game.party.filter((t) => t.id !== d.id && isPlayable(t) && t.sanity < 10).map((t) => (
+                  {here.filter((t) => t.id !== d.id && isPlayable(t) && t.sanity < 10).map((t) => (
                     <button key={t.id} className="btn-small" disabled={!can.ok} onClick={() => update((s) => psychiatry(s, d.id, t.id))}>
                       {shortName(CHARACTER_BY_ID[d.id])} → {shortName(CHARACTER_BY_ID[t.id])} ({t.sanity}/10)
                     </button>

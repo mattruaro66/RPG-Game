@@ -59,7 +59,7 @@ function speakerKey(speaker: string | undefined): string {
   if (!speaker || speaker === 'Narrador') return 'narrador';
   for (const c of CHARACTERS) if (shortName(c) === speaker || c.name === speaker) return c.id;
   try {
-    for (const n of Object.values(content().npcs)) if (n.name === speaker) return n.id;
+    for (const n of Object.values(content().npcs)) if (n.name === speaker || n.alias === speaker) return n.id;
   } catch {
     /* campanha não registrada */
   }
@@ -70,22 +70,24 @@ function clean(text: string): string {
   return text.replace(/^—\s*/, '').replace(/\s+/g, ' ').trim().slice(0, 1900);
 }
 
-export function entriesToLines(entries: NarrativeEntry[], voices: Record<string, Voice>, rate: number): TtsLine[] {
+export type VoiceCasting = 'narrador' | 'personagens';
+
+export function entriesToLines(entries: NarrativeEntry[], voices: Record<string, Voice>, rate: number, casting: VoiceCasting = 'personagens'): TtsLine[] {
   return entries
     .filter((e) => SPOKEN_KINDS.has(e.kind) && e.text.trim())
     .map((e) => {
-      const key = e.kind === 'fala' || (e.kind === 'ia' && e.speaker !== 'Narrador') ? speakerKey(e.speaker) : 'narrador';
+      const key = casting === 'narrador' ? 'narrador' : e.kind === 'fala' || (e.kind === 'ia' && e.speaker !== 'Narrador') ? speakerKey(e.speaker) : 'narrador';
       return { text: clean(e.text), voice: voices[key] ?? voices.outros ?? 'rounded', rate, language: 'pt-BR', id: String(e.id) };
     });
 }
 
-export function VoiceProvider({ children, voices, rate }: { children: ReactNode; voices: Record<string, Voice>; rate: number }) {
+export function VoiceProvider({ children, voices, rate, casting }: { children: ReactNode; voices: Record<string, Voice>; rate: number; casting: VoiceCasting }) {
   const [tts, setTts] = useState<TtsApi | null>(null);
   const [speaking, setSpeaking] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const hasBrowser = typeof window !== 'undefined' && 'speechSynthesis' in window;
-  const settingsRef = useRef({ voices, rate });
-  settingsRef.current = { voices, rate };
+  const settingsRef = useRef({ voices, rate, casting });
+  settingsRef.current = { voices, rate, casting };
 
   useEffect(() => {
     let alive = true;
@@ -148,8 +150,8 @@ export function VoiceProvider({ children, voices, rate }: { children: ReactNode;
       speaking,
       error,
       speakEntries(entries) {
-        const { voices: v, rate: r } = settingsRef.current;
-        play(entriesToLines(entries, v, r));
+        const { voices: v, rate: r, casting: c } = settingsRef.current;
+        play(entriesToLines(entries, v, r, c));
       },
       speakText(text, roleKey = 'narrador') {
         const { voices: v, rate: r } = settingsRef.current;

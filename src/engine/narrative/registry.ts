@@ -1,4 +1,5 @@
-import type { CaseDef, ClueDef, Dialogue, DocumentDef, EncounterDef, NpcDef, ObjectiveDef, Scene } from './types';
+import type { CharacterId } from '../types';
+import type { CallScript, NpcBrief, SceneBrief, CaseDef, ClueDef, Dialogue, DocumentDef, EncounterDef, NpcDef, ObjectiveDef, Scene } from './types';
 
 /** Conteúdo narrativo, separado do motor. Novas campanhas registram seu próprio conteúdo. */
 export interface CampaignContent {
@@ -14,6 +15,9 @@ export interface CampaignContent {
   cases: Record<string, CaseDef>;
   encounters: Record<string, EncounterDef>;
   locations: Record<string, { id: string; name: string; district: string; description: string }>;
+  calls: Partial<Record<CharacterId, CallScript>>;
+  sceneBriefs: Record<string, SceneBrief>;
+  npcBriefs: Record<string, NpcBrief>;
 }
 
 let current: CampaignContent | null = null;

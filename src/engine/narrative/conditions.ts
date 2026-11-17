@@ -2,10 +2,28 @@ import { CHARACTER_BY_ID, shortName } from '../../data/characters';
 import { hasItem } from '../inventory';
 import { isPlayable } from '../sanity';
 import type { GameState } from '../state';
+import type { CharacterId } from '../types';
 import type { Condition, TextBlock } from './types';
 
+/** Ids dos protagonistas presentes (saves antigos: todo o grupo). */
+export function presentIds(s: GameState): CharacterId[] {
+  return s.present ?? s.party.map((c) => c.id);
+}
+
+export function isPresent(s: GameState, id: CharacterId): boolean {
+  return presentIds(s).includes(id);
+}
+
+/** Protagonistas jogáveis E presentes na cena. */
 export function activeParty(s: GameState) {
-  return s.party.filter(isPlayable);
+  const here = presentIds(s);
+  return s.party.filter((c) => isPlayable(c) && here.includes(c.id));
+}
+
+/** Protagonistas jogáveis que estão em outro lugar. */
+export function absentParty(s: GameState) {
+  const here = presentIds(s);
+  return s.party.filter((c) => isPlayable(c) && !here.includes(c.id));
 }
 
 export function evaluate(cond: Condition | undefined, s: GameState): boolean {
@@ -15,6 +33,7 @@ export function evaluate(cond: Condition | undefined, s: GameState): boolean {
   if (cond.notFlag !== undefined && s.flags[cond.notFlag]) return false;
   if (cond.clue && !s.journal.clues.some((c) => c.id === cond.clue)) return false;
   if (cond.notClue && s.journal.clues.some((c) => c.id === cond.notClue)) return false;
+  if (cond.inParty && !s.party.some((c) => c.id === cond.inParty && isPlayable(c))) return false;
   if (cond.hasCharacter && !party.some((c) => c.id === cond.hasCharacter)) return false;
   if (cond.notCharacter && party.some((c) => c.id === cond.notCharacter)) return false;
   if (cond.hasProfession && !party.some((c) => c.profession === cond.hasProfession)) return false;

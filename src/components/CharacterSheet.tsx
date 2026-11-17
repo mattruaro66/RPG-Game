@@ -12,6 +12,7 @@ import type { GameState } from '../engine/state';
 import { ATTRIBUTE_IDS, ATTRIBUTE_LABELS, PROFESSION_LABELS, type CharacterId } from '../engine/types';
 import { dropItem, moveItem, setControl, transferItem } from '../state/session';
 import { useGame } from '../state/GameContext';
+import { activeParty, isPresent } from '../engine/narrative/conditions';
 import { statusLabel } from './PartyPanel';
 import { Bar, Modal, Portrait, Tag } from './ui';
 
@@ -21,7 +22,8 @@ export function CharacterSheet({ id, onClose }: { id: CharacterId; onClose: () =
   const c = game.party.find((p) => p.id === id)!;
   const def = CHARACTER_BY_ID[id];
   const st = statusLabel(c);
-  const others = game.party.filter((p) => p.id !== id && p.status !== 'morto');
+  const here = isPresent(game, id);
+  const others = here ? activeParty(game).filter((p) => p.id !== id) : [];
   const locked = !!game.combat;
 
   return (

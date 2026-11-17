@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { SceneImage } from '../components/SceneImage';
+import { IMAGE_BY_ID } from '../data/images';
+import { npcDisplayName } from '../engine/narrative/effects';
 import { useVoice } from '../platform/voice';
 import { Actions } from '../components/Actions';
 import { CharacterSheet } from '../components/CharacterSheet';
@@ -77,7 +79,11 @@ export function GameScreen() {
       </aside>
 
       <main className="col-main">
-        <SceneImage slotId={game.visual ?? content().scenes[game.sceneId]?.image} compact={!!game.combat} />
+        {(() => {
+          const slotId = game.visual ?? content().scenes[game.sceneId]?.image;
+          const npc = slotId ? IMAGE_BY_ID[slotId]?.npc : undefined;
+          return <SceneImage slotId={slotId} compact={!!game.combat} title={npc ? npcDisplayName(game, npc) : undefined} />;
+        })()}
         {game.combat ? (
           <CombatView game={game} />
         ) : (

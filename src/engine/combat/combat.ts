@@ -13,6 +13,7 @@ import type { CombatState, Combatant, EnemyInstance, GameState } from '../state'
 import type { AttributeId, CharacterId, CharacterState, ContextTag, Dice } from '../types';
 import { moveToEndOfQueue, rollInitiative } from './initiative';
 import type { EncounterDef } from '../narrative/types';
+import { activeParty } from '../narrative/conditions';
 
 export type CombatAction =
   | { type: 'atacar'; targetId: string; weaponUid: string | null; helperIds?: CharacterId[] }
@@ -161,7 +162,7 @@ export function startCombat(s: GameState, dice: Dice, enc: EncounterDef): void {
     const e = createEnemy(tid, counts[tid] > 1 ? String(seen[tid]) : undefined);
     enemies[e.uid] = e;
   }
-  const partyIds = s.party.filter(canAct).map((c) => c.id);
+  const partyIds = activeParty(s).filter(canAct).map((c) => c.id);
   const participants = [
     ...partyIds.map((id) => {
       const c = partyMember(s, id)!;

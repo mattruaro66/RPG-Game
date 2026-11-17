@@ -2,23 +2,24 @@ import { useRef, useState } from 'react';
 import { useImages } from '../platform/images';
 
 /** Foto em foco: local, pessoa ou objeto do momento. */
-export function SceneImage({ slotId, compact = false }: { slotId: string | undefined; compact?: boolean }) {
+export function SceneImage({ slotId, compact = false, title }: { slotId: string | undefined; compact?: boolean; title?: string }) {
   const { resolve } = useImages();
   const img = resolve(slotId);
   if (!img) return null;
   const { slot, url, source } = img;
+  const shownTitle = title ?? slot.title;
   return (
     <figure className={`scene-photo${compact ? ' compact' : ''}${slot.keepColor ? ' keep-color' : ''}`} key={slot.id}>
       {url ? (
-        <img src={url} alt={`${slot.title}. ${slot.caption}`} />
+        <img src={url} alt={`${shownTitle}. ${slot.caption}`} />
       ) : (
-        <div className="photo-missing" role="img" aria-label={`${slot.title}: imagem ainda não definida`}>
-          <span className="photo-missing-title">{slot.title}</span>
+        <div className="photo-missing" role="img" aria-label={`${shownTitle}: imagem ainda não definida`}>
+          <span className="photo-missing-title">{shownTitle}</span>
           <span className="photo-missing-note">Imagem a definir · veja a Galeria</span>
         </div>
       )}
       <figcaption>
-        <strong>{slot.title}</strong> <span>{slot.caption}</span>
+        <strong>{shownTitle}</strong> <span>{slot.caption}</span>
         {source === 'acervo' && slot.bundled && <small className="credit">Foto: {slot.bundled.credit} · {slot.bundled.license}</small>}
       </figcaption>
     </figure>

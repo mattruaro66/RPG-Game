@@ -40,6 +40,7 @@ describe('Cooperação', () => {
 
   function combatState(): GameState {
     const s = newGame(partySelection(['jack', 'daniel', 'mick', 'ray']), 1);
+    s.present = s.party.map((c) => c.id);
     // Ordem: jack, inimigo 1, mick, ray, daniel, inimigo 2 (iniciativa forçada)
     startCombat(s, fixedDice({ d6: [6, 1, 3, 4, 5, 2, ...Array.from({ length: 40 }, (_, i) => (i % 6) + 1)] }), CAMPAIGN.encounters.invasores);
     // Ordem determinística para o teste: protagonistas primeiro, depois inimigos.
@@ -84,6 +85,7 @@ describe('Cooperação', () => {
 describe('Ações de combate', () => {
   it('ataque com arma de fogo aplica dano e o turno avança', () => {
     const s = newGame(partySelection(['jack', 'daniel', 'mick', 'ray']), 2);
+    s.present = s.party.map((c) => c.id);
     startCombat(s, fixedDice({ d6: [1, 1, 6, 1, 1, 1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6, 1] }), CAMPAIGN.encounters.invasores);
     const actor = currentActorId(s)!;
     expect(actor).toBe('mick');
@@ -98,6 +100,7 @@ describe('Ações de combate', () => {
 
   it('crítico com arma de fogo mata um criminoso humano', () => {
     const s = newGame(partySelection(['jack', 'daniel', 'mick', 'ray']), 3);
+    s.present = s.party.map((c) => c.id);
     startCombat(s, fixedDice({ d6: [1, 1, 6, 1, 1, 1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6, 1] }), CAMPAIGN.encounters.invasores);
     const mick = s.party.find((c) => c.id === 'mick')!;
     const enemy = Object.keys(s.combat!.enemies)[0];
@@ -108,6 +111,7 @@ describe('Ações de combate', () => {
 
   it('cobertura é testada antes da esquiva', () => {
     const s = newGame(partySelection(['jack', 'daniel', 'mick', 'ray']), 4);
+    s.present = s.party.map((c) => c.id);
     startCombat(s, fixedDice({ d6: [1, 1, 6, 1, 1, 1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6, 1] }), CAMPAIGN.encounters.invasores);
     const enemy = Object.values(s.combat!.enemies).find((e) => e.weaponItemId === 'revolver_38')!;
     s.combat!.combatants.jack.inCover = true;

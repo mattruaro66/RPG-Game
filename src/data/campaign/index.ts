@@ -1,4 +1,6 @@
 import { registerCampaign, type CampaignContent } from '../../engine/narrative/registry';
+import { CALL_SCRIPTS } from './presence';
+import { NPC_BRIEFS, SCENE_BRIEFS } from './briefs';
 import { CASES, EXTRA_NPCS, EXTRA_OBJECTIVES, LOCATIONS } from './cases';
 import { REED_CLUES, REED_DIALOGUES, REED_DOCUMENTS, REED_ENCOUNTERS, REED_NPCS, REED_OBJECTIVES, REED_SCENES } from './reed';
 
@@ -17,6 +19,9 @@ export const CAMPAIGN: CampaignContent = {
   cases: byId(CASES),
   encounters: byId(REED_ENCOUNTERS),
   locations: LOCATIONS,
+  calls: CALL_SCRIPTS,
+  sceneBriefs: SCENE_BRIEFS,
+  npcBriefs: NPC_BRIEFS,
 };
 
 registerCampaign(CAMPAIGN);

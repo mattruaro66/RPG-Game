@@ -11,12 +11,16 @@ import { CHARACTER_BY_ID, shortName } from '../data/characters';
 import { currentActorId, isEnemy, partyMember, performCombatAction, type CombatAction } from '../engine/combat/combat';
 import { createRng, diceFromRng, newSeed } from '../engine/dice/dice';
 import { addItem, autoPlace, findItem, moveItem as invMove, removeItem } from '../engine/inventory';
-import { pushNarrative, pushTest, pushDiceLines } from '../engine/log';
+import { pushNarrative, pushTest, pushDiceLines, shortTestSummary } from '../engine/log';
 import { treat as engineTreat, TREATMENTS } from '../engine/medical';
 import { advanceTime, applyEffects, enterScene } from '../engine/narrative/effects';
 import { INITIAL_TRACKS } from '../engine/narrative/factions';
 import { content } from '../engine/narrative/registry';
-import { chooseDialogueOption, finalizeTest, performInteraction } from '../engine/narrative/scene';
+import { ambientTags, chooseDialogueOption, finalizeTest, performInteraction } from '../engine/narrative/scene';
+import { activeParty } from '../engine/narrative/conditions';
+import { npcDisplayName } from '../engine/narrative/effects';
+import { characterLimit } from '../engine/character';
+import { actionTest } from '../engine/checks';
 import { createParty, type CharacterSelection } from '../engine/party';
 import { addXp } from '../engine/progression';
 import { canAct, dailySanityRecovery, isPlayable, psychiatricHelp } from '../engine/sanity';
@@ -48,6 +52,7 @@ export function newGame(selections: CharacterSelection[], seed: number = newSeed
     createdAt: new Date().toISOString(),
     party,
     contactId: resolveContact(party.map((p) => p.id)),
+    present: [resolveContact(party.map((p) => p.id))],
     time: rules.startMinute,
     sceneId: c.startScene,
     visitedScenes: [],
@@ -67,7 +72,7 @@ export function newGame(selections: CharacterSelection[], seed: number = newSeed
     gameOver: null,
   };
   return run(s, (d, dice) => {
-    d.journal.events.push({ time: d.time, text: `O grupo se forma: ${d.party.map((p) => shortName(CHARACTER_BY_ID[p.id])).join(', ')}.` });
+    d.journal.events.push({ time: d.time, text: `${shortName(CHARACTER_BY_ID[d.contactId])} espera a cliente sozinho no escritório. O resto do grupo está em outros cantos da cidade.` });
     enterScene(d, dice, c.startScene);
   });
 }
@@ -139,8 +144,10 @@ export function resolvePending(s: GameState, reroll: boolean): GameState {
 
 /**
  * Resposta livre do jogador, já interpretada. Se corresponder a uma ação
- * disponível, o motor a executa com as regras normais; senão, só o
- * narrador responde (sem efeitos mecânicos).
+ * disponível, o motor a executa com as regras normais. Senão, aplica o
+ * improviso validado: falas, narração, um teste de dados opcional (rolado
+ * pelo motor) e ±1 de confiança de um NPC presente. Improviso nunca cria
+ * pistas, itens ou fatos.
  */
 export function freeText(s: GameState, playerText: string, interp: Interpretation, speakerId?: CharacterId): GameState {
   const text = playerText.trim();
@@ -157,8 +164,27 @@ export function freeText(s: GameState, playerText: string, interp: Interpretatio
       performInteraction(d, dice, interp.actionId, actor ?? undefined);
       return;
     }
-    advanceTime(d, 5);
-    if (interp.narration) pushNarrative(d, 'ia', interp.narration, 'Narrador');
+    advanceTime(d, interp.minutes);
+    for (const l of interp.lines) {
+      if (l.who === 'narrador') pushNarrative(d, 'texto', l.text);
+      else pushNarrative(d, 'fala', l.text, npcDisplayName(d, l.who));
+    }
+    if (interp.test) {
+      const who = d.party.find((c) => c.id === (actor ?? d.contactId) && canAct(c)) ?? activeParty(d).find(canAct);
+      if (who) {
+        const b = characterLimit(who, { attribute: interp.test.attribute, specialty: interp.test.specialty ?? undefined }, ambientTags(d));
+        const r = actionTest(dice, interp.test.reason, b);
+        pushTest(d, r, shortName(CHARACTER_BY_ID[who.id]));
+        pushNarrative(d, 'teste', `${shortName(CHARACTER_BY_ID[who.id])}: ${shortTestSummary(r)}`);
+        d.lastTier = r.success ? 'sucesso' : 'falha';
+        pushNarrative(d, 'texto', r.success ? interp.test.success : interp.test.failure);
+      }
+    }
+    if (interp.trust) {
+      const n = d.npcs[interp.trust.npc];
+      if (n) d.npcs[interp.trust.npc] = { ...n, trust: n.trust + interp.trust.delta };
+    }
+    if (interp.notice) pushNarrative(d, 'sistema', interp.notice);
   });
 }
 

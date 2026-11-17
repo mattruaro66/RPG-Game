@@ -14,7 +14,7 @@ import { VoiceProvider } from '../platform/voice';
 function Router() {
   const { screen, toast, settings } = useGame();
   return (
-    <VoiceProvider voices={settings.voices} rate={settings.voiceRate}>
+    <VoiceProvider voices={settings.voices} rate={settings.voiceRate} casting={settings.voiceCasting}>
       {screen === 'menu' && <MainMenu />}
       {screen === 'prologo' && <PrologueScreen />}
       {screen === 'selecao' && <PartySetup />}

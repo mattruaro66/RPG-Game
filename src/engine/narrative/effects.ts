@@ -9,7 +9,7 @@ import { applyHorrorEvent, HORROR_EVENTS } from '../sanity';
 import type { GameState } from '../state';
 import { dayIndex, formatDateTime, minutesUntilHour } from '../time';
 import type { CharacterId, Dice } from '../types';
-import { activeParty, evaluate, interpolate, renderBlocks } from './conditions';
+import { activeParty, evaluate, interpolate, presentIds, renderBlocks } from './conditions';
 import { content } from './registry';
 import type { Effect } from './types';
 import { dailyDrift } from './factions';
@@ -67,6 +67,13 @@ function giveItem(s: GameState, itemId: string, to: CharacterId | undefined): vo
   if (def.documentId && !s.journal.documents.includes(def.documentId)) s.journal.documents.push(def.documentId);
 }
 
+/** Nome do NPC como o grupo o conhece (apelido até ser apresentado). */
+export function npcDisplayName(s: GameState, id: string): string {
+  const def = content().npcs[id];
+  if (!def) return id;
+  return s.npcs[id]?.met || !def.alias ? def.name : def.alias;
+}
+
 export function enterScene(s: GameState, dice: Dice, sceneId: string): void {
   const scene = content().scenes[sceneId];
   if (!scene) throw new Error(`Cena desconhecida: ${sceneId}`);
@@ -93,10 +100,9 @@ export function enterDialogueNode(s: GameState, dice: Dice, dialogueId: string, 
   if (!node) throw new Error(`Nó de diálogo desconhecido: ${dialogueId}/${nodeId}`);
   s.dialogue = { dialogueId, nodeId };
   if (dlg.image) s.visual = dlg.image;
-  const npc = content().npcs[dlg.npc];
   for (const b of renderBlocks(node.text, s)) {
     const speaker = b.speaker ?? node.speaker;
-    const speakerName = speaker === 'narrador' || !speaker ? undefined : speaker === 'npc' ? npc?.name : interpolate(speaker, s);
+    const speakerName = speaker === 'narrador' || !speaker ? undefined : speaker === 'npc' ? npcDisplayName(s, dlg.npc) : interpolate(speaker, s);
     pushNarrative(s, speakerName ? 'fala' : 'texto', b.text, speakerName);
   }
   applyEffects(s, dice, node.effects ?? [], {});
@@ -236,6 +242,14 @@ export function applyEffect(s: GameState, dice: Dice, e: Effect, ctx: EffectCont
     case 'restUntil':
       advanceTime(s, minutesUntilHour(s.time, e.hour));
       pushNarrative(s, 'sistema', `Amanhece. ${formatDateTime(s.time)}.`);
+      break;
+    case 'join': {
+      const here = presentIds(s);
+      if (!here.includes(e.who) && s.party.some((p) => p.id === e.who)) s.present = [...here, e.who];
+      break;
+    }
+    case 'leave':
+      s.present = presentIds(s).filter((id) => id !== e.who);
       break;
     case 'endChapter':
       s.flags.fim_capitulo_1 = true;

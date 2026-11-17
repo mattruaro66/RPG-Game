@@ -6,7 +6,7 @@ import { pushNarrative, pushTest, shortTestSummary } from '../log';
 import { canAct, needsFocusCheck } from '../sanity';
 import type { GameState, PendingTest, TestSource } from '../state';
 import type { CharacterId, CharacterState, ContextTag, Dice } from '../types';
-import { activeParty, evaluate, renderBlocks } from './conditions';
+import { absentParty, activeParty, evaluate, renderBlocks } from './conditions';
 import { advanceTime, applyEffects, enterDialogueNode } from './effects';
 import { content } from './registry';
 import type { DialogueOption, Interaction, Outcome, Outcomes, TestSpec } from './types';
@@ -21,10 +21,41 @@ export function interactionKey(sceneId: string, id: string): string {
   return `${sceneId}:${id}`;
 }
 
+/** Ligações para protagonistas ausentes (cenas com telefone). */
+export function callInteractions(s: GameState): Interaction[] {
+  const scene = currentScene(s);
+  if (!scene?.phone || !evaluate(scene.phone, s) || s.combat) return [];
+  const here = activeParty(s);
+  return absentParty(s).flatMap((c) => {
+    const script = content().calls[c.id];
+    if (!script) return [];
+    const def = CHARACTER_BY_ID[c.id];
+    const knower = here.find((p) => CHARACTER_BY_ID[p.id].knows.includes(c.id));
+    const opener = knower
+      ? `${nameOf(knower.id)} pega o telefone e disca o número de ${nameOf(c.id)} de cabeça.`
+      : `${nameOf(s.contactId)} consegue o telefone de ${def.name} com um conhecido em comum e liga.`;
+    return [{
+      id: `ligar_${c.id}`,
+      label: `Telefonar para ${nameOf(c.id)} (${script.whereabouts})`,
+      kind: 'acao' as const,
+      timeCost: script.arrivalMinutes,
+      text: [{ text: opener }, ...script.call, ...script.arrival],
+      effects: [{ type: 'join' as const, who: c.id }, ...(script.effects ?? [])],
+    }];
+  });
+}
+
+export function findInteraction(s: GameState, id: string): Interaction | undefined {
+  return currentScene(s)?.interactions.find((i) => i.id === id) ?? callInteractions(s).find((i) => i.id === id);
+}
+
 export function visibleInteractions(s: GameState): Interaction[] {
   const scene = currentScene(s);
   if (!scene) return [];
-  return scene.interactions.filter((i) => evaluate(i.if, s) && !(i.once && s.usedInteractions.includes(interactionKey(scene.id, i.id))));
+  return [
+    ...scene.interactions.filter((i) => evaluate(i.if, s) && !(i.once && s.usedInteractions.includes(interactionKey(scene.id, i.id)))),
+    ...callInteractions(s),
+  ];
 }
 
 export function ambientTags(s: GameState): ContextTag[] {
@@ -143,7 +174,7 @@ export function finalizeTest(s: GameState, dice: Dice, pending: PendingTest, rer
 export function performInteraction(s: GameState, dice: Dice, interactionId: string, actorId?: CharacterId, helperIds: CharacterId[] = []): void {
   if (s.pendingTest || s.combat || s.dialogue) return;
   const scene = currentScene(s);
-  const it = scene.interactions.find((i) => i.id === interactionId);
+  const it = findInteraction(s, interactionId);
   if (!it || !evaluate(it.if, s)) return;
   if (it.once && s.usedInteractions.includes(interactionKey(scene.id, it.id))) return;
 

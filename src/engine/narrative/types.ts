@@ -12,7 +12,10 @@ export interface Condition {
   notFlag?: string;
   clue?: string;
   notClue?: string;
+  /** Presente na cena. */
   hasCharacter?: CharacterId;
+  /** Faz parte do grupo (presente ou não). */
+  inParty?: CharacterId;
   notCharacter?: CharacterId;
   hasProfession?: ProfessionId;
   notProfession?: ProfessionId;
@@ -66,6 +69,8 @@ export type Effect =
   | { type: 'combat'; encounter: string }
   | { type: 'narrate'; text: string; kind?: 'texto' | 'perigo' | 'sistema' }
   | { type: 'restUntil'; hour: number }
+  | { type: 'join'; who: CharacterId }
+  | { type: 'leave'; who: CharacterId }
   | { type: 'endChapter' };
 
 // ---------------------------------------------------------------------------
@@ -130,6 +135,10 @@ export interface Scene {
   dangerSense?: string;
   /** Imagem da cena (id de slot em data/images). */
   image?: string;
+  /** Há telefone: permite chamar protagonistas ausentes, se a condição valer. */
+  phone?: Condition;
+  /** NPCs presentes fora de diálogo (para improviso do narrador). */
+  npcs?: string[];
   interactions: Interaction[];
 }
 
@@ -187,6 +196,8 @@ export interface ClueDef {
 export interface NpcDef {
   id: string;
   name: string;
+  /** Como o grupo se refere ao NPC antes de saber o nome. */
+  alias?: string;
   /** Papel como o jogador o conhece. */
   publicRole: string;
   location: string;
@@ -233,4 +244,30 @@ export interface EncounterDef {
   onFlee: Effect[];
   onDefeat: Effect[];
   onEnemiesFled: Effect[];
+}
+
+/** Chamada telefônica para trazer um protagonista ausente. */
+export interface CallScript {
+  /** Onde está (aparece no painel do grupo enquanto ausente). */
+  whereabouts: string;
+  /** Minutos até chegar. */
+  arrivalMinutes: number;
+  call: TextBlock[];
+  arrival: TextBlock[];
+  effects?: Effect[];
+}
+
+/** Roteiro de improviso de uma cena: o que existe ali (sem pistas novas). */
+export interface SceneBrief {
+  ambiente: string;
+  objetos: string[];
+}
+
+/** Roteiro de improviso de um NPC: como fala, o que sabe, o que evita. */
+export interface NpcBrief {
+  persona: string;
+  estilo: string;
+  sabe: string[];
+  evita: string[];
+  naoSabe?: string[];
 }

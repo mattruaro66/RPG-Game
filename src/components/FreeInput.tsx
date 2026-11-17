@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { CHARACTER_BY_ID, shortName } from '../data/characters';
 import { interpret } from '../ai/interpreter';
 import { canAct } from '../engine/sanity';
+import { activeParty } from '../engine/narrative/conditions';
 import type { GameState } from '../engine/state';
 import type { CharacterId } from '../engine/types';
 import { errorCode, useCapability, type DictationApi, type SampleApi } from '../platform/claude';
@@ -13,13 +14,13 @@ import { useGame } from '../state/GameContext';
  */
 export function FreeInput({ game }: { game: GameState }) {
   const { update, notify } = useGame();
-  const able = game.party.filter(canAct);
+  const able = activeParty(game).filter(canAct);
   const defaultSpeaker = (able.find((c) => c.control === 'jogador') ?? able.find((c) => c.id === game.contactId) ?? able[0])?.id;
   const [speaker, setSpeaker] = useState<CharacterId | undefined>(defaultSpeaker);
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const [sample, setSample] = useState<SampleApi | null>(null);
-  const [sampleOff, setSampleOff] = useState(false);
+  const [lastNotice, setLastNotice] = useState<string | null>(null);
   const [dictation, setDictation] = useState<DictationApi | null>(null);
   const [listening, setListening] = useState(false);
   const [partial, setPartial] = useState('');
@@ -61,15 +62,11 @@ export function FreeInput({ game }: { game: GameState }) {
     if (!t || busy) return;
     setBusy(true);
     try {
-      const r = await interpret(sampleOff ? null : sample, game, t, speaker ?? null);
+      const r = await interpret(sample, game, t, speaker ?? null);
+      setLastNotice(r.notice ?? null);
       update((s) => freeText(s, t, r, speaker));
       setText('');
       baseRef.current = '';
-    } catch (e) {
-      if (['not_granted', 'sampling_disabled', 'capability_disabled'].includes(errorCode(e))) {
-        setSampleOff(true);
-        notify('O Claude não está disponível para interpretar respostas. Usando o interpretador simples.');
-      }
     } finally {
       setBusy(false);
     }
@@ -134,9 +131,12 @@ export function FreeInput({ game }: { game: GameState }) {
         </div>
       </div>
       <p className="free-hint muted small">
-        {sample && !sampleOff
-          ? 'O Claude interpreta sua resposta e a encaixa numa ação possível. Os testes e as consequências seguem as regras do jogo.'
-          : 'Interpretador simples: use palavras parecidas com as das ações acima.'}
+        <span className={`master-chip${sample && !lastNotice ? ' on' : ''}`}>{sample && !lastNotice ? 'Mestre: Claude' : 'Mestre: simples'}</span>{' '}
+        {sample && !lastNotice
+          ? 'Escreva o que quiser. O Claude encaixa numa ação possível ou improvisa a cena, sem criar pistas novas; testes e consequências seguem as regras.'
+          : lastNotice
+            ? `${lastNotice}. Usando o interpretador simples: palavras parecidas com as das ações acima.`
+            : 'O Claude só funciona no jogo publicado no claude.ai. Aqui, use palavras parecidas com as das ações acima.'}
       </p>
     </form>
   );

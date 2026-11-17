@@ -89,7 +89,7 @@ Nenhuma solução provisória deve ser tratada como regra definitiva.
 
 | Código | Status | Tema | Solução atual | Pergunta |
 |---|---|---|---|---|
-| P-26 | PROVISÓRIO | IA de linguagem como narrador | No artefato publicado, o Claude (recurso `sample`) **interpreta respostas livres** e as encaixa numa ação disponível; quando nada corresponde, responde com 1–3 frases sem criar fatos. Recebe só a camada do jogador. Fora do claude.ai, interpretador local por palavras. Geração livre de cenas/diálogos novos pela IA: não implementada | A IA pode criar diálogos de NPC inéditos (sem efeitos mecânicos)? Pode improvisar cenas? |
+| P-26 | PROVISÓRIO | IA de linguagem como mestre | No jogo publicado, o Claude interpreta respostas livres: encaixa numa ação pronta ou **improvisa** (falas de NPCs presentes, narração, teste de dados rolado pelo motor, ±1 de confiança). Usa só a camada do jogador e os roteiros de improviso; não cria pistas, nomes, lugares nem fatos; termos da conspiração não descobertos descartam a resposta. Não cria cenas ou capítulos novos | A IA pode, no futuro, gerar cenas inteiras? Pode conceder pistas menores criadas na hora? |
 | P-39 | PROVISÓRIO | Até 4 pessoas + mestre | Cada personagem pode ser “Jogador” ou “IA” (troca a qualquer momento na ficha) — jogo local compartilhado. Modo Mestre opcional mostra a camada interna e permite conceder XP e avançar o tempo | Haverá multijogador em rede? O mestre humano deve poder editar cenas em tempo real? |
 
 ## Imagens, voz e resposta livre
@@ -97,6 +97,8 @@ Nenhuma solução provisória deve ser tratada como regra definitiva.
 | Código | Status | Tema | Solução atual | Pergunta |
 |---|---|---|---|---|
 | P-43 | PROVISÓRIO | Licença das fotos de acervo | Só fotos em domínio público, CC0, CC BY ou CC BY-SA, com crédito na tela e na Galeria. CC BY-SA exige compartilhar derivados sob a mesma licença | Se o jogo for comercializado, substituir as fotos CC BY-SA por imagens próprias? |
-| P-44 | PROVISÓRIO | Vozes por personagem | Há 4 vozes disponíveis; distribuição inicial arbitrária, ajustável em Configurações | Qual voz para cada personagem? |
+| P-44 | PROVISÓRIO | Vozes por personagem | Padrão: um narrador lê tudo (audiolivro). Opcional: voz por personagem, escolhida pelo jogador ouvindo as 4 vozes disponíveis (não há indicação de timbre) | Qual voz combina com cada personagem? |
 | P-45 | PROVISÓRIO | Resposta livre sem ação correspondente | O narrador responde, passam 5 minutos, nenhum efeito mecânico | Uma tentativa sem correspondência deve custar mais tempo ou ter consequências? |
 | P-46 | PENDENTE | Imagens de personagens, NPCs e objetos | Vagas com prompts prontos (`IMAGE_PROMPTS.md`); o dono/editor envia pela Galeria do jogo publicado | Gerar e enviar as imagens |
+| P-47 | PROVISÓRIO | Onde o grupo está no início | Só o contato (Jack, se escolhido) espera a cliente no escritório. Os demais estão em seus afazeres (Bellevue, Village Voice, livraria, turno, serviço) e só podem ser chamados por telefone depois que a cliente sai; chegam em 30–50 min. Ao ligar, Daniel conta do paciente do Bellevue e Liz demonstra interesse nos corpos sem nome | Quem deve estar no escritório quando Victoria chega? Como e quando os outros se juntam? |
+| P-48 | PROVISÓRIO | Roteiros de improviso | Para cada cena: ambiente e objetos presentes; para cada NPC: quem é, como fala, o que conta, o que evita, o que não sabe (`src/data/campaign/briefs.ts`). Victoria só diz o nome se perguntada (ou ao deixar o cartão) | Ajustar a personalidade e o que cada NPC aceita contar |
