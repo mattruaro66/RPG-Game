@@ -5,7 +5,7 @@ import { applyDamage, rollDamage } from '../damage';
 import { autoPlace, makeUid, removeItem, allItems } from '../inventory';
 import { pushDiceLines, pushNarrative, pushTest } from '../log';
 import { addXp } from '../progression';
-import { applyHorrorEvent, HORROR_EVENTS } from '../sanity';
+import { applyHorrorEvent, HORROR_EVENTS, isPlayable } from '../sanity';
 import type { GameState } from '../state';
 import { dayIndex, formatDateTime, minutesUntilHour } from '../time';
 import type { CharacterId, Dice } from '../types';
@@ -72,6 +72,31 @@ export function npcDisplayName(s: GameState, id: string): string {
   const def = content().npcs[id];
   if (!def) return id;
   return s.npcs[id]?.met || !def.alias ? def.name : def.alias;
+}
+
+/**
+ * Avança um deslocamento: toca a próxima cena “Enquanto isso” elegível
+ * (só o protagonista dela fica presente) ou, se não houver, devolve o grupo
+ * e entra na cena de destino.
+ */
+export function continueTravel(s: GameState, dice: Dice): void {
+  const t = s.travel;
+  if (!t) return;
+  const here = t.savedPresent ?? presentIds(s);
+  while (t.queue.length) {
+    const id = t.queue.shift()!;
+    const sc = content().scenes[id];
+    if (!sc?.cast) continue;
+    const ok = s.party.some((p) => p.id === sc.cast && isPlayable(p)) && !here.includes(sc.cast) && !s.visitedScenes.includes(id) && evaluate(sc.interludeIf, s);
+    if (!ok) continue;
+    if (!t.savedPresent) t.savedPresent = here;
+    s.present = [sc.cast];
+    enterScene(s, dice, id);
+    return;
+  }
+  if (t.savedPresent) s.present = t.savedPresent;
+  s.travel = undefined;
+  enterScene(s, dice, t.target);
 }
 
 export function enterScene(s: GameState, dice: Dice, sceneId: string): void {
@@ -239,6 +264,11 @@ export function applyEffect(s: GameState, dice: Dice, e: Effect, ctx: EffectCont
     case 'narrate':
       pushNarrative(s, e.kind ?? 'texto', interpolate(e.text, s));
       break;
+    case 'waitUntil': {
+      const cur = s.time % 1440;
+      if (cur < e.minuteOfDay) advanceTime(s, e.minuteOfDay - cur);
+      break;
+    }
     case 'restUntil':
       advanceTime(s, minutesUntilHour(s.time, e.hour));
       pushNarrative(s, 'sistema', `Amanhece. ${formatDateTime(s.time)}.`);
@@ -250,6 +280,13 @@ export function applyEffect(s: GameState, dice: Dice, e: Effect, ctx: EffectCont
     }
     case 'leave':
       s.present = presentIds(s).filter((id) => id !== e.who);
+      break;
+    case 'travel':
+      s.travel = { target: e.scene, queue: [...(e.interludes ?? [])], savedPresent: null };
+      continueTravel(s, dice);
+      break;
+    case 'endInterlude':
+      continueTravel(s, dice);
       break;
     case 'endChapter':
       s.flags.fim_capitulo_1 = true;

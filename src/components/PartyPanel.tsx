@@ -35,7 +35,7 @@ export function PartyPanel({ game, onOpen, activeId }: { game: GameState; onOpen
               <Bar value={c.hp} max={c.maxHp} kind="hp" label={`PV ${c.hp}/${c.maxHp}`} />
               <Bar value={c.sanity} max={10} kind="san" label={`Sanidade ${c.sanity}/10`} />
               <Tag tone={st.tone}>{st.text}</Tag>
-              {!here && isPlayable(c) && <Tag tone="muted" title="Fora da cena. Pode ser chamado por telefone.">Ausente · {content().calls[c.id]?.whereabouts ?? 'em outro lugar'}</Tag>}
+              {!here && isPlayable(c) && <Tag tone="muted" title="Fora da cena. Pode ser chamado por telefone.">{game.travel?.savedPresent?.includes(c.id) ? 'Em outra cena · com o grupo' : `Ausente · ${content().calls[c.id]?.whereabouts ?? 'em outro lugar'}`}</Tag>}
             </div>
           </button>
         );

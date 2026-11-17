@@ -2,7 +2,7 @@ import { validate, buildPrompt, SAFE_FALLBACK } from '../ai/interpreter';
 import { activeParty } from '../engine/narrative/conditions';
 import { visibleInteractions } from '../engine/narrative/scene';
 import { chooseOption, freeText, interact, newGame } from '../state/session';
-import { partySelection } from './helpers';
+import { meetAndDecide, partySelection } from './helpers';
 
 const start = (seed = 31) => newGame(partySelection(['jack', 'daniel', 'mick', 'liz']), seed);
 const meetVictoria = (seed = 31) => interact(start(seed), 'esperar_cliente');
@@ -14,29 +14,21 @@ describe('Presença do grupo', () => {
     expect(s.narrative.some((e) => e.text.includes('Mick Donovan'))).toBe(false);
   });
 
-  it('só dá para telefonar depois que a cliente sai', () => {
+  it('só dá para telefonar depois que a cliente sai, e só para quem alguém presente conhece', () => {
     let s = start();
     expect(visibleInteractions(s).some((i) => i.id.startsWith('ligar_'))).toBe(false);
-    s = meetVictoria();
-    s = chooseOption(s, 'quem');
-    s = chooseOption(s, 'voltar');
-    s = chooseOption(s, 'aceitar');
-    s = chooseOption(s, 'fim');
-    const calls = visibleInteractions(s).filter((i) => i.id.startsWith('ligar_')).map((i) => i.id);
-    expect(calls.sort()).toEqual(['ligar_daniel', 'ligar_liz', 'ligar_mick']);
+    s = meetAndDecide(s, true);
+    expect(s.sceneId).toBe('escritorio_noite');
+    // Jack conhece Liz (e Ray, fora do grupo). Mick e Daniel não são conhecidos de Jack.
+    expect(visibleInteractions(s).filter((i) => i.id.startsWith('ligar_')).map((i) => i.id)).toEqual(['ligar_liz']);
   });
 
-  it('chamar Daniel o traz para a cena e abre o gancho do Bellevue', () => {
-    let s = meetVictoria();
-    s = chooseOption(s, 'quem');
-    s = chooseOption(s, 'voltar');
-    s = chooseOption(s, 'aceitar');
-    s = chooseOption(s, 'fim');
-    const t0 = s.time;
-    s = interact(s, 'ligar_daniel');
-    expect(activeParty(s).map((c) => c.id)).toContain('daniel');
-    expect(s.journal.clues.some((c) => c.id === 'prontuario_desaparecido')).toBe(true);
-    expect(s.time - t0).toBeGreaterThanOrEqual(30);
+  it('a ligação é curta e não despeja a história de quem é chamado', () => {
+    let s = meetAndDecide(start(), true);
+    s = interact(s, 'ligar_liz');
+    expect(activeParty(s).map((c) => c.id)).toEqual(['jack', 'liz']);
+    const call = s.narrative.slice(-6).map((e) => e.text).join(' ');
+    expect(call).not.toMatch(/corpos|funerária|perfura|prontuário/i);
   });
 
   it('ausentes não aparecem como opção de teste nem entram em combate', () => {

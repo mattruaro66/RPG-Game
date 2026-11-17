@@ -80,6 +80,14 @@ Pronto-socorro, Manhattan. Já tem foto de acervo (Eden, Janine and Jim, CC BY 2
 exterior of Bellevue Hospital in Manhattan at night, ambulance bay lights, wet pavement, 1990s, black and white 35mm film photograph, New York City, December 1992, film noir lighting, deep shadows, high contrast, visible film grain, Kodak Tri-X 400 pushed, documentary realism, no text, no watermark, no logos
 ```
 
+### Redação do Village Voice — `loc_redacao`
+
+Noite de fechamento.
+
+```
+cramped alternative weekly newspaper newsroom at night in 1992, typewriters and a few beige computers, overflowing ashtrays, stacks of papers, posters of punk shows on the wall, a woman at a desk holding a phone, black and white 35mm film photograph, New York City, December 1992, film noir lighting, deep shadows, high contrast, visible film grain, Kodak Tri-X 400 pushed, documentary realism, no text, no watermark, no logos
+```
+
 ### Metrô, linha N — `loc_metro`
 
 O último trem da noite. Já tem foto de acervo (Alex Lozupone, CC BY 4.0 · modificada); gerar é opcional.
@@ -112,6 +120,14 @@ Retrato de estúdio, outubro de 1991.
 
 ```
 studio portrait of a 38-year-old financial consultant in a grey suit and wine-colored tie, practiced confident smile, 1991 corporate headshot, black and white 35mm film photograph, New York City, December 1992, film noir lighting, deep shadows, high contrast, visible film grain, Kodak Tri-X 400 pushed, documentary realism, no text, no watermark, no logos
+```
+
+### O homem de terno escuro — `npc_homem_terno`
+
+Educado. Calmo demais.
+
+```
+man in an impeccable dark suit at a hospital reception desk at night, calm polite smile that does not reach his eyes, perfectly dry while everyone else is wet from the rain, black and white 35mm film photograph, New York City, December 1992, film noir lighting, deep shadows, high contrast, visible film grain, Kodak Tri-X 400 pushed, documentary realism, no text, no watermark, no logos
 ```
 
 ### Os invasores — `npc_invasores`

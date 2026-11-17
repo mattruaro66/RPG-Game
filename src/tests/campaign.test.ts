@@ -6,7 +6,7 @@ import { essentialCluesWithoutGuarantee, referenceErrors } from '../engine/narra
 import { visibleInteractions } from '../engine/narrative/scene';
 import { deserialize, loadGame, saveGame, serialize, setStorage } from '../persistence/storage';
 import { chooseOption, interact, newGame, resolveContact } from '../state/session';
-import { partySelection } from './helpers';
+import { meetAndDecide, partySelection } from './helpers';
 
 describe('Conteúdo da campanha', () => {
   it('não há referências quebradas', () => {
@@ -37,13 +37,9 @@ describe('Composição do grupo', () => {
   it('a campanha é jogável sem Jack nem Ray (pista essencial do endereço sem dados)', () => {
     let s = newGame(partySelection(['daniel', 'mick', 'liz', 'maggie']), 7);
     expect(s.contactId).toBe('liz');
-    s = interact(s, 'esperar_cliente');
-    expect(s.dialogue?.dialogueId).toBe('victoria');
-    s = chooseOption(s, 'quem');
-    s = chooseOption(s, 'voltar');
-    s = chooseOption(s, 'recusar');
+    s = meetAndDecide(s, false);
     expect(s.journal.clues.some((c) => c.id === 'endereco_thomas')).toBe(true);
-    s = chooseOption(s, 'fim');
+    expect(s.sceneId).toBe('escritorio_noite');
     s = interact(s, 'ir_apartamento');
     expect(s.sceneId).toBe('portaria');
     // Entrada sem teste de dados

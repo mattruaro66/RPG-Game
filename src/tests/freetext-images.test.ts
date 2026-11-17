@@ -13,7 +13,7 @@ describe('Resposta livre', () => {
   it('o interpretador local encontra a ação pelas palavras', () => {
     const s = start();
     expect(localInterpret(s, 'Quero examinar o jornal que está na mesa').actionId).toBe('jornal');
-    expect(localInterpret(s, 'Abro a gaveta da escrivaninha').actionId).toBe('gaveta');
+    expect(localInterpret(s, 'Quero ouvir os recados da secretária eletrônica').actionId).toBe('recados');
   });
 
   it('sem correspondência, não executa nada e só o narrador responde', () => {

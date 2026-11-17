@@ -29,17 +29,16 @@ export function callInteractions(s: GameState): Interaction[] {
   return absentParty(s).flatMap((c) => {
     const script = content().calls[c.id];
     if (!script) return [];
-    const def = CHARACTER_BY_ID[c.id];
-    const knower = here.find((p) => CHARACTER_BY_ID[p.id].knows.includes(c.id));
-    const opener = knower
-      ? `${nameOf(knower.id)} pega o telefone e disca o número de ${nameOf(c.id)} de cabeça.`
-      : `${nameOf(s.contactId)} consegue o telefone de ${def.name} com um conhecido em comum e liga.`;
+    // Só liga quem conhece: relações da seção 21 (nos dois sentidos).
+    const knower = here.find((p) => CHARACTER_BY_ID[p.id].knows.includes(c.id) || CHARACTER_BY_ID[c.id].knows.includes(p.id));
+    if (!knower) return [];
+    const fill = (t: string) => t.replace(/\{chamador\}/g, nameOf(knower.id));
     return [{
       id: `ligar_${c.id}`,
-      label: `Telefonar para ${nameOf(c.id)} (${script.whereabouts})`,
+      label: `${nameOf(knower.id)} telefona para ${nameOf(c.id)}`,
       kind: 'acao' as const,
       timeCost: script.arrivalMinutes,
-      text: [{ text: opener }, ...script.call, ...script.arrival],
+      text: [...script.call, ...script.arrival].map((b) => ({ ...b, text: fill(b.text) })),
       effects: [{ type: 'join' as const, who: c.id }, ...(script.effects ?? [])],
     }];
   });
@@ -243,8 +242,11 @@ export function chooseDialogueOption(s: GameState, dice: Dice, optionId: string,
   if (!cur) return;
   const opt = visibleOptions(s).find((o) => o.id === optionId);
   if (!opt) return;
-  const speaker = actorId ?? s.contactId;
-  pushNarrative(s, 'fala', spokenText ?? opt.label, nameOf(speaker));
+  const here = activeParty(s);
+  const speaker = actorId ?? (here.some((c) => c.id === s.contactId) ? s.contactId : here[0]?.id ?? s.contactId);
+  const said = spokenText ?? opt.label;
+  // Rótulos entre parênteses são ações de interface, não falas.
+  if (!/^\(.*\)$/.test(said.trim())) pushNarrative(s, 'fala', said, nameOf(speaker));
   advanceTime(s, 3);
   if (opt.test) {
     const actor = actorId ?? defaultActor(s, opt.test);

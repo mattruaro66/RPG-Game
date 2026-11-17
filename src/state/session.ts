@@ -154,7 +154,9 @@ export function freeText(s: GameState, playerText: string, interp: Interpretatio
   if (!text) return s;
   return run(s, (d, dice) => {
     const actor = interp.actorId ?? speakerId;
-    const speaker = shortName(CHARACTER_BY_ID[actor ?? d.contactId]);
+    const here = activeParty(d);
+    const fallback = here.some((c) => c.id === d.contactId) ? d.contactId : here[0]?.id ?? d.contactId;
+    const speaker = shortName(CHARACTER_BY_ID[actor ?? fallback]);
     if (interp.actionId && d.dialogue) {
       chooseDialogueOption(d, dice, interp.actionId, actor ?? undefined, [], text);
       return;

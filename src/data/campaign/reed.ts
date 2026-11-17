@@ -20,7 +20,6 @@ export const REED_SCENES: Scene[] = [
   {
     id: 'escritorio',
     image: 'cena_escritorio',
-    phone: { flag: 'victoria_saiu' },
     title: 'Midtown, Rua 46 Oeste — fim de tarde',
     location: 'loc_escritorio',
     caseId: 'caso_reed',
@@ -37,6 +36,24 @@ export const REED_SCENES: Scene[] = [
     ],
     interactions: [
       {
+        id: 'recados', image: 'obj_secretaria', label: 'Ouvir os recados da secretária eletrônica', kind: 'examinar', once: true, timeCost: 5,
+        text: [
+          { text: 'Dois recados. O primeiro é do dentista do andar de baixo, reclamando do aquecedor.' },
+          { text: 'O segundo começa com um silêncio educado.' },
+          { text: '“Senhor Sullivan. Falo da parte do senhor Whitmore. Ele pediu que eu lembrasse que sexta-feira é sexta-feira. O senhor Whitmore é um homem paciente.” Uma pausa. “Mas a paciência é um recurso.” Clique.', speaker: 'Recado' },
+          { text: 'Jack apaga a fita. Não adianta: a voz continua na sala.', if: { contactIs: 'jack' } },
+          { text: '{contato} não sabia que as coisas estavam tão ruins para Jack.', if: { contactIsNot: 'jack' } },
+        ],
+        effects: [{ type: 'flag', key: 'recado_whitmore' }],
+      },
+      {
+        id: 'janela', image: 'cena_escritorio', label: 'Olhar a rua pela janela', kind: 'examinar', once: true, timeCost: 5,
+        text: [
+          { text: 'Garoa fina na Rua 46. Guarda-chuvas pretos, vapor dos bueiros, um Papai Noel do Exército da Salvação balançando o sino em frente a uma loja de eletrônicos fechada.' },
+          { text: 'Faltam vinte e quatro dias para o Natal. A cidade já está cansada dele.' },
+        ],
+      },
+      {
         id: 'jornal', image: 'obj_jornal', label: 'Examinar o jornal do dia', kind: 'examinar', once: true,
         text: [
           { text: 'O Daily News, dobrado na página doze: “CORPO SEM IDENTIFICAÇÃO ENCONTRADO NO PIER 40 — o terceiro em novembro, segundo funcionários do necrotério”. Três parágrafos. Nenhum nome. Nenhuma causa da morte.' },
@@ -46,6 +63,7 @@ export const REED_SCENES: Scene[] = [
       },
       {
         id: 'gaveta', image: 'obj_promissoria', label: 'Abrir a gaveta da escrivaninha', kind: 'examinar', once: true,
+        if: { flag: 'recado_whitmore' },
         text: [
           { text: 'Jack abriu a gaveta que evitava. Entre recibos de penhor, a nota promissória: trezentos mil dólares devidos a Richard Whitmore. A assinatura dele, firme demais para quem sabia que não poderia pagar.', if: { contactIs: 'jack' } },
           { text: 'Na gaveta de Jack, entre recibos de penhor, {contato} encontra uma nota promissória: trezentos mil dólares devidos a Richard Whitmore. Talvez isso explique o sumiço.', if: { contactIsNot: 'jack' } },
@@ -53,36 +71,14 @@ export const REED_SCENES: Scene[] = [
         effects: [{ type: 'clue', id: 'divida_richard' }],
       },
       {
-        id: 'esperar_cliente', label: 'Aguardar', kind: 'esperar', once: true, timeCost: 50,
+        id: 'esperar_cliente', label: 'Aguardar a cliente', kind: 'esperar', once: true, timeCost: 0,
         if: { notFlag: 'victoria_chegou' },
-        text: [{ text: 'Os minutos se arrastam. O aquecedor estala. Às 17h40, três batidas na porta — leves, espaçadas, de quem não tem pressa.' }],
+        text: [{ text: 'Os minutos se arrastam. O aquecedor estala. A garoa engrossa contra a janela. Pouco antes das seis, três batidas na porta — leves, espaçadas, de quem não tem pressa.' }],
         effects: [
+          { type: 'waitUntil', minuteOfDay: 17 * 60 + 40 },
           { type: 'flag', key: 'victoria_chegou' },
           { type: 'dialogue', id: 'victoria' },
         ],
-      },
-      {
-        id: 'ligar_victoria', image: 'obj_cartao', label: 'Telefonar para Victoria Whitmore e aceitar o caso', kind: 'dialogo', once: true,
-        if: { all: [{ flag: 'caso_recusado' }, { notFlag: 'caso_aceito' }, { hasItem: 'cartao_victoria' }] },
-        text: [
-          { text: 'O número do cartão toca seis vezes. Quando ela atende, a voz não demonstra surpresa.' },
-          { text: '— Eu sabia que ligaria. A chave estará com o porteiro, em um envelope com o seu nome. Não me faça arrepender disso.', speaker: 'Victoria Whitmore' },
-        ],
-        effects: [
-          { type: 'flag', key: 'caso_aceito' },
-          { type: 'decision', id: 'reconsiderou', label: 'Reconsiderou e aceitou o caso de Victoria Whitmore.' },
-          { type: 'trust', npc: 'victoria', delta: 1 },
-          { type: 'flag', key: 'chave_com_porteiro' },
-          { type: 'objective', id: 'obj_decidir', status: 'concluido' },
-          { type: 'objective', id: 'obj_encontrar_thomas', status: 'ativo' },
-          { type: 'objective', id: 'obj_apartamento', status: 'ativo' },
-        ],
-      },
-      {
-        id: 'ir_apartamento', label: 'Ir ao prédio de Thomas Reed (Upper East Side)', kind: 'mover', timeCost: 40,
-        if: { clue: 'endereco_thomas' },
-        text: [{ text: 'Um táxi amarelo, um motorista que fala sozinho em grego, a Park Avenue iluminada como uma vitrine. Rua 78 Leste.' }],
-        effects: [{ type: 'goto', scene: 'portaria' }],
       },
     ],
   },
@@ -443,8 +439,8 @@ export const REED_SCENES: Scene[] = [
       { text: 'As iniciais R.W. aparecem onde não deveriam. Richard Whitmore — ou alguém que quer que pareça ser ele.', if: { any: [{ clue: 'agenda_decalque' }, { clue: 'documentos_halcyon' }] } },
       { text: 'Um nome volta sempre: Nocturne, na Ludlow Street.', if: { any: [{ clue: 'fosforos_nocturne' }, { clue: 'conversa_invasores' }] } },
       { text: 'E aquele símbolo dentro da caixa de fósforos não sai da cabeça de ninguém.', if: { clue: 'simbolo_fosforos' } },
-      { text: 'Daniel ainda pensa no paciente do Bellevue. Na palidez. Nas duas perfurações. No prontuário que sumiu.', if: { hasCharacter: 'daniel' } },
-      { text: 'Liz relê a notícia do Pier 40. Corpos sem nome. Registros incompletos. Ela conhece alguém na funerária que talvez fale — se ainda estiver disposto.', if: { hasCharacter: 'liz' } },
+      { text: 'Daniel não fala do Bellevue. Mas, quando alguém menciona o banheiro do 5C, ele fica em silêncio por tempo demais.', if: { all: [{ hasCharacter: 'daniel' }, { clue: 'perfuracoes' }] } },
+      { text: 'Liz relê a notícia do Pier 40 duas vezes e não diz por quê.', if: { all: [{ hasCharacter: 'liz' }, { clue: 'fonte_funeraria' }] } },
       { text: 'Fim do primeiro capítulo de demonstração. A cidade continua se movendo: o que vocês fizerem a seguir — e o que deixarem de fazer — terá consequências.' },
     ],
     onEnter: [
@@ -458,7 +454,16 @@ export const REED_SCENES: Scene[] = [
       {
         id: 'descansar', label: 'Descansar até a manhã seguinte', kind: 'esperar', timeCost: 0,
         text: [{ text: 'Algumas horas de sono ruim no sofá e nas cadeiras. Lá fora, a cidade não dorme.' }],
-        effects: [{ type: 'restUntil', hour: 8 }],
+        effects: [{ type: 'restUntil', hour: 8 }, { type: 'flag', key: 'amanheceu' }],
+      },
+      {
+        id: 'prontuario_some', label: 'O telefone toca cedo', kind: 'acao', once: true, timeCost: 10,
+        if: { all: [{ flag: 'amanheceu' }, { flag: 'homem_terno_visto' }] },
+        text: [
+          { text: 'É Ruth, a enfermeira do Bellevue, procurando por Daniel. A voz está baixa, como quem fala de um corredor.' },
+          { text: '— O prontuário do desconhecido da madrugada. Sumiu do arquivo. Ninguém assinou a retirada. — Uma pausa. — Achei que você ia querer saber antes da direção.', speaker: 'Ruth' },
+        ],
+        effects: [{ type: 'clue', id: 'prontuario_desaparecido' }, { type: 'objective', id: 'obj_bellevue', status: 'ativo' }],
       },
     ],
   },
@@ -494,8 +499,10 @@ export const REED_DIALOGUES: Dialogue[] = [
         options: [
           { id: 'nome', label: 'Com quem eu estou falando, afinal?', once: true, if: { notFlag: 'victoria_nome' }, next: 'nome' },
           { id: 'quem', label: 'Quem é o homem?', if: { notClue: 'thomas_desaparecido' }, next: 'thomas' },
-          { id: 'morto', label: 'Por que acha que ele está morto?', once: true, if: { clue: 'thomas_desaparecido' }, next: 'morto' },
-          { id: 'policia', label: 'E por que não procurou a polícia?', once: true, if: { clue: 'thomas_desaparecido' }, next: 'policia' },
+          { id: 'oficio', label: 'O que ele faz da vida?', once: true, if: { clue: 'thomas_desaparecido' }, next: 'oficio' },
+          { id: 'relacao', label: 'E quem é Thomas Reed para a senhora?', once: true, if: { clue: 'thomas_desaparecido' }, next: 'relacao' },
+          { id: 'morto', label: 'A senhora acha que ele está vivo?', once: true, if: { used: 'dlg:victoria:relacao' }, next: 'morto' },
+          { id: 'policia', label: 'E por que não procurou a polícia?', once: true, if: { used: 'dlg:victoria:relacao' }, next: 'policia' },
           { id: 'marido', label: 'Fale sobre o seu marido.', once: true, if: { used: 'dlg:victoria:policia' }, next: 'richard' },
           { id: 'pagamento', label: 'E quanto ao pagamento?', once: true, if: { clue: 'thomas_desaparecido' }, next: 'pagamento' },
           {
@@ -533,16 +540,31 @@ export const REED_DIALOGUES: Dialogue[] = [
       },
       thomas: {
         text: [
-          { text: '— Thomas Reed. Trinta e oito anos. Consultor financeiro. — Ela faz uma pausa curta. — Desapareceu há onze dias.', speaker: 'npc' },
-          { text: '— Ele é meu amante. Não vou fingir o contrário, não temos tempo para isso. — A voz não treme. — E eu acredito que ele esteja morto.', speaker: 'npc' },
+          { text: '— Thomas Reed.', speaker: 'npc' },
+          { text: 'Ela deixa o nome no ar por um instante, como se esperasse uma reação.' },
+          { text: '— Faz onze dias que ninguém o vê.', speaker: 'npc' },
         ],
         effects: [{ type: 'clue', id: 'thomas_desaparecido' }, { type: 'meet', npc: 'thomas' }],
         options: [{ id: 'voltar', label: '(Continuar)', next: 'conversa' }],
       },
+      oficio: {
+        text: [{ text: '— Consultor financeiro. Trinta e oito anos. Bom com números, péssimo com segredos. — Ela corrige a si mesma. — Era. É.', speaker: 'npc' }],
+        effects: [{ type: 'clue', id: 'thomas_desaparecido', extra: '38 anos, consultor financeiro.' }],
+        options: [{ id: 'voltar', label: '(Continuar)', next: 'conversa' }],
+      },
+      relacao: {
+        text: [
+          { text: 'Pela primeira vez, ela demora a responder.' },
+          { text: '— Meu amante. Não vou fingir o contrário. Não temos tempo para isso.', speaker: 'npc' },
+        ],
+        effects: [{ type: 'clue', id: 'thomas_desaparecido', extra: 'É amante da cliente.' }],
+        options: [{ id: 'voltar', label: '(Continuar)', next: 'conversa' }],
+      },
       morto: {
         text: [
-          { text: '— Porque em dois anos ele nunca passou um dia sem me telefonar. Nem um. — Ela finalmente tira uma das luvas, dedo por dedo. — E porque eu sinto. Pode chamar isso do que quiser.', speaker: 'npc' },
+          { text: '— Não. — A resposta vem rápida demais. Ela tira uma das luvas, dedo por dedo, antes de continuar. — Em dois anos, ele nunca passou um dia sem me telefonar. Nem um. Eu acredito que ele esteja morto. Pode chamar isso de intuição, se quiser.', speaker: 'npc' },
         ],
+        effects: [{ type: 'clue', id: 'thomas_desaparecido', extra: 'Ela acredita que ele esteja morto.' }],
         options: [{ id: 'voltar', label: '(Continuar)', next: 'conversa' }],
       },
       policia: {
@@ -580,7 +602,7 @@ export const REED_DIALOGUES: Dialogue[] = [
           { text: 'Ela assente uma vez, como se nunca tivesse duvidado.' },
           { text: '— Ele morava na Rua 78 Leste, número 211, apartamento 5C. — Ela coloca sobre a mesa uma chave, uma fotografia e um cartão cor de vinho. — O porteiro se chama Sal. É discreto. Não confie em ninguém que diga trabalhar para mim.', speaker: 'npc' },
           { text: 'No cartão, apenas um nome e um telefone: Victoria Whitmore.', if: { notFlag: 'victoria_nome' } },
-          { text: 'Quando ela sai, o corredor fica frio por um tempo que ninguém comenta. O telefone sobre a mesa parece maior agora — talvez seja hora de chamar reforços.' },
+          { text: 'Quando ela sai, o corredor fica frio por um tempo que ninguém comenta.' },
         ],
         effects: [
           { type: 'meet', npc: 'victoria' },
@@ -597,7 +619,7 @@ export const REED_DIALOGUES: Dialogue[] = [
           { type: 'objective', id: 'obj_apartamento', status: 'ativo' },
           { type: 'time', minutes: 20 },
         ],
-        options: [{ id: 'fim', label: '(Encerrar a conversa)', next: null }],
+        options: [{ id: 'fim', label: '(Encerrar a conversa)', next: null, effects: [{ type: 'travel', scene: 'escritorio_noite', interludes: ['interludio_bellevue', 'interludio_voice'] }] }],
       },
       recusa: {
         text: [
@@ -615,7 +637,7 @@ export const REED_DIALOGUES: Dialogue[] = [
           { type: 'item', itemId: 'cartao_victoria' },
           { type: 'clue', id: 'endereco_thomas' },
         ],
-        options: [{ id: 'fim', label: '(Encerrar a conversa)', next: null }],
+        options: [{ id: 'fim', label: '(Encerrar a conversa)', next: null, effects: [{ type: 'travel', scene: 'escritorio_noite', interludes: ['interludio_bellevue', 'interludio_voice'] }] }],
       },
     },
   },
@@ -788,7 +810,7 @@ export const REED_ENCOUNTERS: EncounterDef[] = [
 // ---------------------------------------------------------------------------
 
 export const REED_CLUES: ClueDef[] = [
-  { id: 'thomas_desaparecido', image: 'npc_thomas', caseId: 'caso_reed', importance: 'essencial', title: 'Thomas Reed desapareceu', description: 'Thomas Reed, 38 anos, consultor financeiro, desapareceu há onze dias. É amante da cliente, que acredita que ele esteja morto.', location: 'loc_escritorio', characters: ['victoria', 'thomas'], related: ['endereco_thomas'], memoryDetail: 'A cliente se referiu a Thomas no passado duas vezes antes de dizer que acreditava que ele estivesse morto.' },
+  { id: 'thomas_desaparecido', image: 'npc_thomas', caseId: 'caso_reed', importance: 'essencial', title: 'Thomas Reed desapareceu', description: 'Thomas Reed não é visto há onze dias.', location: 'loc_escritorio', characters: ['victoria', 'thomas'], related: ['endereco_thomas'], memoryDetail: 'A cliente se referiu a Thomas no passado duas vezes antes de dizer que acreditava que ele estivesse morto.' },
   { id: 'endereco_thomas', caseId: 'caso_reed', importance: 'essencial', title: 'Endereço de Thomas Reed', description: 'Rua 78 Leste, nº 211, apartamento 5C, Upper East Side. O porteiro se chama Sal.', location: 'loc_escritorio', characters: ['victoria', 'sal'], related: ['thomas_desaparecido'] },
   { id: 'richard_influencia', caseId: 'caso_reed', importance: 'importante', title: 'Os amigos de Richard Whitmore', description: 'Segundo Victoria, o marido tem amigos na polícia e “em lugares que você provavelmente nem imagina”. Ela não pode procurar a polícia.', location: 'loc_escritorio', characters: ['victoria', 'richard'], related: ['divida_richard'] },
   { id: 'divida_richard', image: 'obj_promissoria', caseId: 'caso_reed', importance: 'importante', title: 'A dívida de Jack', description: 'Jack Sullivan deve trezentos mil dólares a Richard Whitmore.', location: 'loc_escritorio', characters: ['richard'], related: ['richard_influencia', 'documentos_halcyon'] },
@@ -808,7 +830,7 @@ export const REED_CLUES: ClueDef[] = [
   { id: 'bilhete_invasor', caseId: 'caso_reed', importance: 'importante', title: 'O bilhete do invasor', description: 'Um papel amassado com um endereço e um horário.', location: 'loc_apartamento', characters: [], related: ['conversa_invasores', 'fosforos_nocturne'] },
   // Ganchos para as outras investigações
   { id: 'noticia_corpos', image: 'obj_jornal', caseId: 'caso_voice', importance: 'secundaria', title: 'Corpo sem identificação no Pier 40', description: 'Segundo o Daily News, é o terceiro corpo não identificado em novembro. Sem nome, sem causa da morte.', location: 'loc_escritorio', characters: [], related: [] },
-  { id: 'prontuario_desaparecido', caseId: 'caso_bellevue', importance: 'secundaria', title: 'O prontuário desaparecido', description: 'O prontuário do paciente que morreu no Bellevue, com perda sanguínea inexplicável, sumiu do arquivo depois da visita de um homem de terno escuro.', location: 'loc_escritorio', characters: ['daniel'], related: ['vestigios_sangue'] },
+  { id: 'prontuario_desaparecido', caseId: 'caso_bellevue', importance: 'importante', title: 'O prontuário desaparecido', description: 'Na manhã seguinte, o prontuário do paciente desconhecido sumiu do arquivo do Bellevue, sem registro de retirada.', location: 'loc_escritorio', characters: ['daniel'], related: ['vestigios_sangue'] },
 ];
 
 export const REED_NPCS: NpcDef[] = [

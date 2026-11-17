@@ -15,7 +15,7 @@ export const CASES: CaseDef[] = [
   {
     id: 'caso_bellevue',
     title: 'O paciente do Bellevue',
-    summary: 'Um homem morreu no pronto-socorro com uma perda de sangue que os ferimentos não explicam. Seu prontuário desapareceu.',
+    summary: 'Um homem sem nome morreu no pronto-socorro do Bellevue com uma perda de sangue que os ferimentos não explicam.',
     centralCharacter: 'daniel',
   },
   {
@@ -32,13 +32,15 @@ export const EXTRA_OBJECTIVES: ObjectiveDef[] = [
 ];
 
 export const EXTRA_NPCS: NpcDef[] = [
-  { id: 'homem_terno', gender: 'm', name: 'Homem de terno escuro', publicRole: 'Esteve no Bellevue pedindo o prontuário.', location: 'Desconhecida', initialTrust: 0, publicNotes: 'Ninguém lembra do rosto dele com clareza.' },
-  { id: 'fonte_funeraria', name: 'Fonte da funerária', publicRole: 'Funcionário de funerária que procurou Liz Morgan.', location: 'Desconhecida', initialTrust: 1, publicNotes: 'Pediu anonimato. Deixou de responder.' },
+  { id: 'homem_terno', gender: 'm', name: 'Homem de terno escuro', publicRole: 'Esteve no Bellevue pedindo o prontuário.', location: 'Desconhecida', initialTrust: 0, publicNotes: 'Educado, calmo demais. Não se molhou na chuva.' },
+  { id: 'fonte_funeraria', gender: 'm', voiceNames: [], name: 'Fonte da funerária', publicRole: 'Funcionário de funerária que ligou para Liz Morgan.', location: 'Desconhecida', initialTrust: 0, publicNotes: 'Pediu anonimato. Sotaque do Queens.' },
 ];
 
 export const LOCATIONS = {
   loc_escritorio: { id: 'loc_escritorio', name: 'Escritório de Jack Sullivan', district: 'Midtown', description: 'Quarto andar de um prédio cansado da Rua 46 Oeste.' },
   loc_predio_thomas: { id: 'loc_predio_thomas', name: 'Prédio de Thomas Reed', district: 'Upper East Side', description: 'Rua 78 Leste, nº 211. Pré-guerra, toldo verde.' },
   loc_apartamento: { id: 'loc_apartamento', name: 'Apartamento 5C', district: 'Upper East Side', description: 'O apartamento de Thomas Reed.' },
+  loc_bellevue: { id: 'loc_bellevue', name: 'Bellevue Hospital', district: 'Kips Bay', description: 'Pronto-socorro e necrotério, Primeira Avenida.' },
+  loc_redacao: { id: 'loc_redacao', name: 'Redação do Village Voice', district: 'East Village', description: 'Cooper Square, noite de fechamento.' },
   loc_rua78: { id: 'loc_rua78', name: 'Rua 78 Leste', district: 'Upper East Side', description: 'Calçada fria, vapor dos bueiros.' },
 };

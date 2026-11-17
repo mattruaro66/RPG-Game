@@ -69,7 +69,10 @@ export type Effect =
   | { type: 'combat'; encounter: string }
   | { type: 'narrate'; text: string; kind?: 'texto' | 'perigo' | 'sistema' }
   | { type: 'restUntil'; hour: number }
+  | { type: 'waitUntil'; minuteOfDay: number }
   | { type: 'join'; who: CharacterId }
+  | { type: 'travel'; scene: string; interludes?: string[] }
+  | { type: 'endInterlude' }
   | { type: 'leave'; who: CharacterId }
   | { type: 'endChapter' };
 
@@ -139,6 +142,10 @@ export interface Scene {
   phone?: Condition;
   /** NPCs presentes fora de diálogo (para improviso do narrador). */
   npcs?: string[];
+  /** Cena “Enquanto isso”: só este protagonista está presente. */
+  cast?: CharacterId;
+  /** Condição extra para a cena “Enquanto isso” acontecer. */
+  interludeIf?: Condition;
   interactions: Interaction[];
 }
 

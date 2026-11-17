@@ -180,5 +180,7 @@ export interface GameState {
   visual?: string;
   /** Protagonistas presentes na cena atual (os demais estão em outro lugar). */
   present?: CharacterId[];
+  /** Deslocamento em curso, com cenas “Enquanto isso” intercaladas. */
+  travel?: { target: string; queue: string[]; savedPresent: CharacterId[] | null };
   lastTier?: Tier;
 }
