@@ -8,66 +8,141 @@ import { useCapability, type TtsApi, type TtsLine, type Voice } from './claude';
 /**
  * Narração e diálogos falados, em português do Brasil.
  *
- * Elenco padrão (por gênero): uma voz para o narrador, uma voz masculina
- * para todos os homens e uma feminina para todas as mulheres.
+ * Catálogo de vozes = cada voz base × três variações (normal, mais grave e
+ * lenta, mais rápida). Vozes base:
+ *  - do Claude (capacidade `tts`): 4 vozes sem timbre oficial; o jogador as
+ *    classifica uma vez como masculina/feminina (calibração);
+ *  - do navegador: vozes pt-BR instaladas, classificadas pelo nome.
  *
- * Motores:
- *  - vozes do Claude (capacidade `tts` do artefato) — 4 vozes, sem
- *    indicação oficial de timbre; em pt-BR podem soar parecidas;
- *  - vozes do navegador (Web Speech) — usa as vozes pt-BR instaladas,
- *    separando masculinas e femininas pelo nome (ex.: Daniel/Maria no
- *    Windows, Luciana/Felipe no macOS).
+ * Elenco: configuração base (narrador, NPCs masculinos, NPCs femininos) e
+ * uma voz para cada protagonista, entre as opções do gênero dele.
  */
 
-export const VOICES: { id: Voice; label: string }[] = [
-  { id: 'buttery', label: 'Voz 1 (buttery)' },
-  { id: 'airy', label: 'Voz 2 (airy)' },
-  { id: 'glassy', label: 'Voz 3 (glassy)' },
-  { id: 'rounded', label: 'Voz 4 (rounded)' },
-];
-
 export type Gender = 'm' | 'f';
-export type VoiceCasting = 'genero' | 'narrador' | 'personagens';
 export type VoiceEngine = 'claude' | 'navegador';
+export type VoiceCasting = 'elenco' | 'narrador';
 
-/** Vozes do Claude por papel. `masculino`/`feminino` valem no elenco por gênero. */
-export const DEFAULT_VOICES: Record<string, Voice> = {
-  narrador: 'buttery',
-  masculino: 'rounded',
-  feminino: 'airy',
-  jack: 'rounded',
-  daniel: 'rounded',
-  mick: 'rounded',
-  ray: 'rounded',
-  liz: 'airy',
-  maggie: 'airy',
-  victoria: 'glassy',
-  sal: 'rounded',
-  outros: 'rounded',
-};
+export const CLAUDE_VOICES: Voice[] = ['buttery', 'airy', 'glassy', 'rounded'];
+/** Palpite inicial até o jogador calibrar (não há informação oficial de timbre). */
+export const DEFAULT_CLAUDE_GENDERS: Record<Voice, Gender> = { buttery: 'm', rounded: 'm', airy: 'f', glassy: 'f' };
 
-export const VOICE_ROLES: { key: string; label: string }[] = [
-  { key: 'narrador', label: 'Narrador' },
-  ...CHARACTERS.map((c) => ({ key: c.id, label: shortName(c) })),
-  { key: 'victoria', label: 'Victoria Whitmore' },
-  { key: 'sal', label: 'Sal Benedetto' },
-  { key: 'outros', label: 'Outros personagens' },
-];
-
-export type VoiceMode = 'claude' | 'navegador' | 'nenhuma';
-
-interface VoiceCtx {
-  mode: VoiceMode;
-  claudeAvailable: boolean;
-  browserVoices: { male: string | null; female: string | null; narrator: string | null };
-  speaking: boolean;
-  speakEntries(entries: NarrativeEntry[]): void;
-  speakText(text: string, role?: string): void;
-  stop(): void;
-  error: string | null;
+export interface VoiceVariant {
+  id: 'normal' | 'grave' | 'rapida';
+  label: string;
+  rate: number;
+  pitch: number;
 }
 
-const Ctx = createContext<VoiceCtx | null>(null);
+export const VARIANTS: VoiceVariant[] = [
+  { id: 'normal', label: 'normal', rate: 1, pitch: 1 },
+  { id: 'grave', label: 'mais grave e pausada', rate: 0.86, pitch: 0.85 },
+  { id: 'rapida', label: 'mais viva e rápida', rate: 1.12, pitch: 1.12 },
+];
+
+export interface VoiceOption {
+  /** "claude:<voz>:<variação>" ou "nav:<nome da voz>:<variação>". */
+  id: string;
+  engine: VoiceEngine;
+  base: string;
+  gender: Gender;
+  variant: VoiceVariant;
+  label: string;
+}
+
+/** Atribuições: chaves 'narrador', 'npc_m', 'npc_f' e ids dos protagonistas. */
+export type CastAssign = Record<string, string>;
+
+export interface VoiceSettings {
+  engine: VoiceEngine;
+  casting: VoiceCasting;
+  rate: number;
+  claudeGenders: Record<Voice, Gender>;
+  cast: Partial<Record<VoiceEngine, CastAssign>>;
+}
+
+export const CAST_ROLES: { key: string; label: string; gender: Gender | null }[] = [
+  { key: 'narrador', label: 'Narrador', gender: null },
+  { key: 'npc_m', label: 'NPCs masculinos', gender: 'm' },
+  { key: 'npc_f', label: 'NPCs femininos', gender: 'f' },
+  ...CHARACTERS.map((c) => ({ key: c.id, label: shortName(c), gender: c.gender })),
+];
+
+// ---------------------------------------------------------------------------
+// Catálogo
+// ---------------------------------------------------------------------------
+
+const FEMALE_NAMES = ['maria', 'francisca', 'luciana', 'fernanda', 'vitoria', 'vitória', 'raquel', 'leticia', 'letícia', 'thalita', 'brenda', 'elza', 'giovanna', 'yara', 'manuela', 'leila', 'joana', 'camila', 'female', 'feminina', 'mulher', 'google português do brasil'];
+const MALE_NAMES = ['daniel', 'antonio', 'antônio', 'felipe', 'fabio', 'fábio', 'julio', 'júlio', 'donato', 'humberto', 'valerio', 'valério', 'nicolau', 'male', 'masculina', 'homem'];
+
+export function classifyBrowserVoice(name: string): Gender | null {
+  const n = name.toLowerCase();
+  if (MALE_NAMES.some((m) => n.includes(m))) return 'm';
+  if (FEMALE_NAMES.some((f) => n.includes(f))) return 'f';
+  return null;
+}
+
+const CLAUDE_LABEL: Record<Voice, string> = { buttery: 'Buttery', airy: 'Airy', glassy: 'Glassy', rounded: 'Rounded' };
+
+export function claudeCatalog(genders: Record<Voice, Gender>): VoiceOption[] {
+  return CLAUDE_VOICES.flatMap((v) =>
+    VARIANTS.map((variant) => ({
+      id: `claude:${v}:${variant.id}`,
+      engine: 'claude' as const,
+      base: v,
+      gender: genders[v],
+      variant,
+      label: `${CLAUDE_LABEL[v]} — ${variant.label}`,
+    })),
+  );
+}
+
+export function browserCatalog(voiceNames: string[]): VoiceOption[] {
+  return voiceNames.flatMap((name) => {
+    const g = classifyBrowserVoice(name);
+    const genders: Gender[] = g ? [g] : ['m', 'f'];
+    return genders.flatMap((gender) =>
+      VARIANTS.map((variant) => ({
+        id: `nav:${name}:${gender}:${variant.id}`,
+        engine: 'navegador' as const,
+        base: name,
+        gender,
+        // Voz sem gênero conhecido: o tom aproxima o gênero pedido.
+        variant: g ? variant : { ...variant, pitch: variant.pitch * (gender === 'm' ? 0.8 : 1.25) },
+        label: `${name.replace(/ - Portuguese \(Brazil\)|\(Natural\)|Microsoft |Online /g, '').trim()}${g ? '' : gender === 'm' ? ' (tom grave)' : ' (tom agudo)'} — ${variant.label}`,
+      })),
+    );
+  });
+}
+
+/** Elenco automático: tenta dar a cada papel uma voz diferente. */
+export function autoCast(catalog: VoiceOption[]): CastAssign {
+  const male = catalog.filter((o) => o.gender === 'm');
+  const female = catalog.filter((o) => o.gender === 'f');
+  const byVariant = (list: VoiceOption[], variant: VoiceVariant['id']) => list.filter((o) => o.variant.id === variant);
+  const pick = (list: VoiceOption[], i: number) => (list.length ? list[i % list.length].id : catalog[0]?.id ?? '');
+  const out: CastAssign = {};
+  const maleBases = [...new Set(male.map((o) => o.base))];
+  // Narrador: versão grave da primeira voz masculina (ou feminina, se não houver).
+  out.narrador = pick(byVariant(male.length ? male : female, 'grave'), 0);
+  out.npc_m = pick(byVariant(male, 'normal'), maleBases.length > 1 ? 1 : 0);
+  out.npc_f = pick(byVariant(female, 'normal'), 0);
+  // Protagonistas: percorre as opções do gênero, pulando as já usadas.
+  const used = new Set(Object.values(out));
+  for (const c of CHARACTERS) {
+    const pool = c.gender === 'm' ? male : female;
+    const ordered = [...byVariant(pool, 'normal'), ...byVariant(pool, 'rapida'), ...byVariant(pool, 'grave')];
+    const free = ordered.find((o) => !used.has(o.id)) ?? ordered[0];
+    if (free) {
+      out[c.id] = free.id;
+      used.add(free.id);
+    }
+  }
+  return out;
+}
+
+// ---------------------------------------------------------------------------
+// Quem fala
+// ---------------------------------------------------------------------------
 
 const SPOKEN_KINDS = new Set(['cena', 'texto', 'fala', 'ia', 'perigo']);
 
@@ -98,69 +173,75 @@ export function genderOf(key: string): Gender | null {
   return key === 'outros' ? 'm' : null;
 }
 
+/** Chave de elenco para um papel: protagonista → id; NPC → npc_m/npc_f; resto → narrador. */
+export function castKey(key: string): string {
+  if (key === 'narrador') return 'narrador';
+  if (CHARACTER_BY_ID[key as CharacterId]) return key;
+  const g = genderOf(key);
+  return g === 'f' ? 'npc_f' : g === 'm' ? 'npc_m' : 'narrador';
+}
+
 function clean(text: string): string {
   return text.replace(/^—\s*/, '').replace(/\s+/g, ' ').trim().slice(0, 1900);
 }
 
-/** Linha pronta para falar, com o papel resolvido (para o motor do navegador). */
-export interface CastLine extends TtsLine {
-  role: 'narrador' | Gender;
+export interface CastLine {
+  text: string;
+  id?: string;
+  /** Papel resolvido (para testes e para o motor). */
+  key: string;
+  option: VoiceOption | null;
+  rate: number;
 }
 
-export function entriesToLines(entries: NarrativeEntry[], voices: Record<string, Voice>, rate: number, casting: VoiceCasting = 'genero'): CastLine[] {
+export function entriesToLines(entries: NarrativeEntry[], catalog: VoiceOption[], cast: CastAssign, rate = 1, casting: VoiceCasting = 'elenco'): CastLine[] {
+  const byId = new Map(catalog.map((o) => [o.id, o]));
+  const auto = autoCast(catalog);
   return entries
     .filter((e) => SPOKEN_KINDS.has(e.kind) && e.text.trim())
     .map((e) => {
       const isSpeech = e.kind === 'fala' || (e.kind === 'ia' && e.speaker !== 'Narrador');
-      const key = isSpeech ? speakerKey(e.speaker) : 'narrador';
-      const gender = genderOf(key);
-      const role: CastLine['role'] = casting === 'narrador' || !gender ? 'narrador' : gender;
-      let voice: Voice;
-      if (casting === 'narrador' || role === 'narrador') voice = voices.narrador ?? 'buttery';
-      else if (casting === 'genero') voice = role === 'm' ? voices.masculino ?? 'rounded' : voices.feminino ?? 'airy';
-      else voice = voices[key] ?? (role === 'm' ? voices.masculino : voices.feminino) ?? 'rounded';
-      return { text: clean(e.text), voice, rate, language: 'pt-BR', id: String(e.id), role };
+      const key = casting === 'narrador' || !isSpeech ? 'narrador' : castKey(speakerKey(e.speaker));
+      const option = byId.get(cast[key]) ?? byId.get(auto[key]) ?? null;
+      const r = Math.min(1.5, Math.max(0.7, (option?.variant.rate ?? 1) * rate));
+      return { text: clean(e.text), id: String(e.id), key, option, rate: r };
     });
 }
 
 // ---------------------------------------------------------------------------
-// Vozes do navegador
+// Provedor
 // ---------------------------------------------------------------------------
 
-const FEMALE_NAMES = ['maria', 'francisca', 'luciana', 'fernanda', 'vitoria', 'vitória', 'raquel', 'leticia', 'letícia', 'thalita', 'brenda', 'elza', 'giovanna', 'yara', 'manuela', 'leila', 'joana', 'camila', 'female', 'feminina', 'mulher', 'google português do brasil'];
-const MALE_NAMES = ['daniel', 'antonio', 'antônio', 'felipe', 'fabio', 'fábio', 'julio', 'júlio', 'donato', 'humberto', 'valerio', 'valério', 'nicolau', 'macerio', 'male', 'masculina', 'homem'];
+export type VoiceMode = 'claude' | 'navegador' | 'nenhuma';
 
-export function classifyBrowserVoice(name: string): Gender | null {
-  const n = name.toLowerCase();
-  if (MALE_NAMES.some((m) => n.includes(m))) return 'm';
-  if (FEMALE_NAMES.some((f) => n.includes(f))) return 'f';
-  return null;
+interface VoiceCtx {
+  mode: VoiceMode;
+  claudeAvailable: boolean;
+  catalog: VoiceOption[];
+  cast: CastAssign;
+  speaking: boolean;
+  speakEntries(entries: NarrativeEntry[]): void;
+  /** Fala um texto com um papel do elenco ou com uma opção específica. */
+  speakText(text: string, roleOrOption?: string): void;
+  stop(): void;
+  error: string | null;
 }
 
-function pickBrowserVoices(): { male: SpeechSynthesisVoice | null; female: SpeechSynthesisVoice | null; narrator: SpeechSynthesisVoice | null } {
-  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return { male: null, female: null, narrator: null };
+const Ctx = createContext<VoiceCtx | null>(null);
+
+function listBrowserVoices(): SpeechSynthesisVoice[] {
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return [];
   const all = window.speechSynthesis.getVoices();
   const br = all.filter((v) => v.lang.toLowerCase().replace('_', '-').startsWith('pt-br'));
-  const pt = br.length ? br : all.filter((v) => v.lang.toLowerCase().startsWith('pt'));
-  const male = pt.filter((v) => classifyBrowserVoice(v.name) === 'm');
-  const female = pt.filter((v) => classifyBrowserVoice(v.name) === 'f');
-  const m = male[0] ?? null;
-  const f = female[0] ?? null;
-  // Narrador: uma terceira voz masculina, se houver; senão a masculina.
-  const narrator = male[1] ?? m ?? pt.find((v) => v !== f) ?? pt[0] ?? null;
-  return { male: m, female: f, narrator };
+  return br.length ? br : all.filter((v) => v.lang.toLowerCase().startsWith('pt'));
 }
 
-// ---------------------------------------------------------------------------
-
-export function VoiceProvider({ children, voices, rate, casting, engine }: { children: ReactNode; voices: Record<string, Voice>; rate: number; casting: VoiceCasting; engine: VoiceEngine }) {
+export function VoiceProvider({ children, settings }: { children: ReactNode; settings: VoiceSettings }) {
   const [tts, setTts] = useState<TtsApi | null>(null);
   const [speaking, setSpeaking] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [browserSet, setBrowserSet] = useState(pickBrowserVoices);
+  const [browserVoices, setBrowserVoices] = useState<SpeechSynthesisVoice[]>(listBrowserVoices);
   const hasBrowser = typeof window !== 'undefined' && 'speechSynthesis' in window;
-  const settingsRef = useRef({ voices, rate, casting });
-  settingsRef.current = { voices, rate, casting };
 
   useEffect(() => {
     let alive = true;
@@ -178,75 +259,74 @@ export function VoiceProvider({ children, voices, rate, casting, engine }: { chi
         /* ignora */
       }
     });
-    if (hasBrowser) {
-      const refresh = () => alive && setBrowserSet(pickBrowserVoices());
-      window.speechSynthesis.addEventListener?.('voiceschanged', refresh);
-      return () => {
-        alive = false;
-        off?.();
-        window.speechSynthesis.removeEventListener?.('voiceschanged', refresh);
-      };
-    }
+    const refresh = () => alive && setBrowserVoices(listBrowserVoices());
+    if (hasBrowser) window.speechSynthesis.addEventListener?.('voiceschanged', refresh);
     return () => {
       alive = false;
       off?.();
+      if (hasBrowser) window.speechSynthesis.removeEventListener?.('voiceschanged', refresh);
     };
   }, [hasBrowser]);
 
-  const useClaude = !!tts && engine === 'claude';
-  const mode: VoiceMode = useClaude ? 'claude' : hasBrowser ? 'navegador' : 'nenhuma';
-
-  const browserSpeak = useCallback(
-    (lines: CastLine[]) => {
-      const synth = window.speechSynthesis;
-      synth.cancel();
-      lines.forEach((l, i) => {
-        const u = new SpeechSynthesisUtterance(l.text);
-        u.lang = 'pt-BR';
-        const v = l.role === 'm' ? browserSet.male : l.role === 'f' ? browserSet.female : browserSet.narrator;
-        if (v) u.voice = v;
-        // Sem voz do gênero instalada: aproxima pelo tom.
-        u.pitch = !v ? (l.role === 'f' ? 1.35 : l.role === 'm' ? 0.75 : 0.95) : l.role === 'narrador' && v === browserSet.male ? 0.9 : 1;
-        u.rate = l.rate ?? 1;
-        if (i === 0) u.onstart = () => setSpeaking(true);
-        if (i === lines.length - 1) u.onend = () => setSpeaking(false);
-        synth.speak(u);
-      });
-    },
-    [browserSet],
+  const engine: VoiceEngine = tts && settings.engine === 'claude' ? 'claude' : 'navegador';
+  const mode: VoiceMode = engine === 'claude' ? 'claude' : hasBrowser ? 'navegador' : 'nenhuma';
+  const catalog = useMemo(
+    () => (engine === 'claude' ? claudeCatalog(settings.claudeGenders) : browserCatalog(browserVoices.length ? browserVoices.map((v) => v.name) : ['Voz do sistema'])),
+    [engine, settings.claudeGenders, browserVoices],
   );
+  const cast = useMemo(() => ({ ...autoCast(catalog), ...(settings.cast[engine] ?? {}) }), [catalog, settings.cast, engine]);
+
+  const ref = useRef({ catalog, cast, settings });
+  ref.current = { catalog, cast, settings };
 
   const play = useCallback(
     (lines: CastLine[]) => {
       if (!lines.length) return;
       setError(null);
-      if (useClaude && tts) {
-        const plain: TtsLine[] = lines.map(({ text, voice, rate: r, language, id }) => ({ text, voice, rate: r, language, id }));
+      if (engine === 'claude' && tts) {
+        const plain: TtsLine[] = lines.map((l) => ({ text: l.text, voice: (l.option?.base as Voice) ?? 'buttery', rate: l.rate, language: 'pt-BR', id: l.id }));
         tts.speak(plain).catch((e: { code?: string }) => {
           if (e?.code === 'not_granted') setError('A narração foi desativada para esta página.');
           else if (e?.code === 'no_gesture') setError('Clique em qualquer lugar da página para liberar o áudio.');
           else if (e?.code === 'rate_limited') setError('Narração pausada por excesso de uso.');
         });
-      } else if (hasBrowser) browserSpeak(lines);
+        return;
+      }
+      if (!hasBrowser) return;
+      const synth = window.speechSynthesis;
+      synth.cancel();
+      lines.forEach((l, i) => {
+        const u = new SpeechSynthesisUtterance(l.text);
+        u.lang = 'pt-BR';
+        const v = browserVoices.find((x) => x.name === l.option?.base);
+        if (v) u.voice = v;
+        u.pitch = l.option?.variant.pitch ?? 1;
+        u.rate = l.rate;
+        if (i === 0) u.onstart = () => setSpeaking(true);
+        if (i === lines.length - 1) u.onend = () => setSpeaking(false);
+        synth.speak(u);
+      });
     },
-    [useClaude, tts, hasBrowser, browserSpeak],
+    [engine, tts, hasBrowser, browserVoices],
   );
 
   const value = useMemo<VoiceCtx>(
     () => ({
       mode,
       claudeAvailable: !!tts,
-      browserVoices: { male: browserSet.male?.name ?? null, female: browserSet.female?.name ?? null, narrator: browserSet.narrator?.name ?? null },
+      catalog,
+      cast,
       speaking,
       error,
       speakEntries(entries) {
-        const { voices: v, rate: r, casting: c } = settingsRef.current;
-        play(entriesToLines(entries, v, r, c));
+        const { catalog: c, cast: k, settings: s } = ref.current;
+        play(entriesToLines(entries, c, k, s.rate, s.casting));
       },
-      speakText(text, role = 'narrador') {
-        const { voices: v, rate: r } = settingsRef.current;
-        const g: CastLine['role'] = role === 'masculino' ? 'm' : role === 'feminino' ? 'f' : genderOf(role) ?? 'narrador';
-        play([{ text: clean(text), voice: v[role] ?? 'buttery', rate: r, language: 'pt-BR', role: g }]);
+      speakText(text, roleOrOption = 'narrador') {
+        const { catalog: c, cast: k, settings: s } = ref.current;
+        const option = c.find((o) => o.id === roleOrOption) ?? c.find((o) => o.id === k[roleOrOption]) ?? c[0] ?? null;
+        const rate = Math.min(1.5, Math.max(0.7, (option?.variant.rate ?? 1) * s.rate));
+        play([{ text: clean(text), key: roleOrOption, option, rate }]);
       },
       stop() {
         if (tts) tts.stop().catch(() => undefined);
@@ -254,7 +334,7 @@ export function VoiceProvider({ children, voices, rate, casting, engine }: { chi
         setSpeaking(false);
       },
     }),
-    [mode, tts, browserSet, speaking, error, play, hasBrowser],
+    [mode, tts, catalog, cast, speaking, error, play, hasBrowser],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

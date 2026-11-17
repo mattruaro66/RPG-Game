@@ -373,3 +373,6 @@ ul.compact li { margin: 0.2em 0; }
 .casting legend { font-family: var(--font-type); padding: 0 0.3em; }
 .master-chip { font-family: var(--font-mono); font-size: 0.85em; border: 1px solid var(--ash); padding: 0 0.4em; text-transform: uppercase; letter-spacing: 0.06em; }
 .master-chip.on { border-color: var(--ok); color: #b5cba5; }
+.calib-grid { display: grid; gap: 0.3em; }
+.calib-row { display: flex; gap: 0.8em; align-items: center; flex-wrap: wrap; }
+.calib-row strong { min-width: 5.5em; font-family: var(--font-mono); }

@@ -4,8 +4,7 @@ import type { GameState } from '../engine/state';
 import type { CharacterSelection } from '../engine/party';
 import { DEFAULT_SETTINGS, loadGame, loadSettings, saveGame, saveSettings, type Settings, type SlotId } from '../persistence/storage';
 import { newGame } from './session';
-import { DEFAULT_VOICES, type VoiceCasting, type VoiceEngine } from '../platform/voice';
-import type { Voice } from '../platform/claude';
+import { DEFAULT_CLAUDE_GENDERS, type VoiceSettings } from '../platform/voice';
 
 export type Screen = 'menu' | 'prologo' | 'selecao' | 'jogo' | 'personagens' | 'regras' | 'config' | 'carregar' | 'galeria';
 
@@ -13,10 +12,7 @@ export interface AppSettings extends Settings {
   minDamage: MinDamagePolicy;
   bonusOnusConflict: BonusOnusConflictPolicy;
   autoNarrate: boolean;
-  voiceRate: number;
-  voices: Record<string, Voice>;
-  voiceCasting: VoiceCasting;
-  voiceEngine: VoiceEngine;
+  voice: VoiceSettings;
   /** Versão do esquema de vozes; ao mudar, o elenco volta ao padrão. */
   voiceSchema: number;
 }
@@ -38,17 +34,25 @@ interface Ctx {
 
 const GameCtx = createContext<Ctx | null>(null);
 
-const VOICE_SCHEMA = 2;
+const VOICE_SCHEMA = 3;
+
+export const DEFAULT_VOICE_SETTINGS: VoiceSettings = {
+  engine: 'claude',
+  casting: 'elenco',
+  rate: 1,
+  claudeGenders: { ...DEFAULT_CLAUDE_GENDERS },
+  cast: {},
+};
 
 function initialSettings(): AppSettings {
-  const base = loadSettings() as Partial<AppSettings>;
-  const s = { ...DEFAULT_SETTINGS, minDamage: 0, bonusOnusConflict: 'onus_prevalece', autoNarrate: true, voiceRate: 1, voiceCasting: 'genero', voiceEngine: 'claude', voiceSchema: VOICE_SCHEMA, ...base } as AppSettings;
-  s.voices = { ...DEFAULT_VOICES, ...(base.voices ?? {}) };
-  if (base.voiceSchema !== VOICE_SCHEMA) {
-    // Elenco novo: narrador + voz masculina + voz feminina.
-    s.voiceCasting = 'genero';
-    s.voices = { ...DEFAULT_VOICES };
+  const base = loadSettings() as Partial<AppSettings> & Record<string, unknown>;
+  const s = { ...DEFAULT_SETTINGS, minDamage: 0, bonusOnusConflict: 'onus_prevalece', autoNarrate: true, ...base } as AppSettings;
+  if (base.voiceSchema !== VOICE_SCHEMA || !base.voice) {
+    // Formato novo de vozes: elenco base + voz por protagonista.
+    s.voice = { ...DEFAULT_VOICE_SETTINGS, rate: typeof base.voiceRate === 'number' ? base.voiceRate : 1 };
     s.voiceSchema = VOICE_SCHEMA;
+  } else {
+    s.voice = { ...DEFAULT_VOICE_SETTINGS, ...base.voice, claudeGenders: { ...DEFAULT_CLAUDE_GENDERS, ...base.voice.claudeGenders } };
   }
   return s;
 }

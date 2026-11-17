@@ -3,7 +3,7 @@ import { CONSPIRACY_OVERVIEW, INTERNAL_NPCS } from '../data/campaign/internal';
 import { IMAGE_BY_ID, IMAGE_SLOTS } from '../data/images';
 import { CHARACTERS } from '../data/characters';
 import { buildPrompt, interpret, localInterpret, validate } from '../ai/interpreter';
-import { entriesToLines, DEFAULT_VOICES } from '../platform/voice';
+import { entriesToLines, claudeCatalog, autoCast, DEFAULT_CLAUDE_GENDERS } from '../platform/voice';
 import { chooseOption, freeText, interact, newGame } from '../state/session';
 import { partySelection } from './helpers';
 
@@ -108,9 +108,9 @@ describe('Imagens e áudio', () => {
   it('a narração fala o texto e as falas, com a voz de cada personagem, e não lê rolagens', () => {
     let s = interact(start(), 'esperar_cliente');
     s = chooseOption(s, 'quem');
-    const lines = entriesToLines(s.narrative, DEFAULT_VOICES, 1);
-    expect(lines.every((l) => l.language === 'pt-BR')).toBe(true);
-    expect(lines.some((l) => l.voice === DEFAULT_VOICES.feminino && l.role === 'f' && l.text.includes('Thomas Reed'))).toBe(true);
+    const cat = claudeCatalog(DEFAULT_CLAUDE_GENDERS);
+    const lines = entriesToLines(s.narrative, cat, autoCast(cat));
+    expect(lines.some((l) => l.key === 'npc_f' && l.option?.gender === 'f' && l.text.includes('Thomas Reed'))).toBe(true);
     expect(lines.some((l) => l.text.startsWith('Nova pista'))).toBe(false);
   });
 });
