@@ -5,6 +5,7 @@ import { useGame } from '../state/GameContext';
 export function LoadScreen() {
   const { go, load, save, game } = useGame();
   const [, refresh] = useState(0);
+  const [confirming, setConfirming] = useState<string | null>(null);
   const saves = listSaves();
   return (
     <main className="doc-screen">
@@ -27,7 +28,13 @@ export function LoadScreen() {
               <div className="row">
                 <button disabled={!meta} onClick={() => load(slot)}>Carregar</button>
                 {game && slot !== 'auto' && <button onClick={() => { save(slot); refresh((n) => n + 1); }}>Salvar aqui</button>}
-                {meta && slot !== 'auto' && <button className="btn-ghost" onClick={() => { if (window.confirm('Apagar este arquivo?')) { deleteSave(slot); refresh((n) => n + 1); } }}>Apagar</button>}
+                {meta && slot !== 'auto' && confirming !== slot && <button className="btn-ghost" onClick={() => setConfirming(slot)}>Apagar</button>}
+                {meta && confirming === slot && (
+                  <>
+                    <button className="btn-primary" onClick={() => { deleteSave(slot); setConfirming(null); refresh((n) => n + 1); }}>Confirmar exclusão</button>
+                    <button className="btn-ghost" onClick={() => setConfirming(null)}>Cancelar</button>
+                  </>
+                )}
               </div>
             </article>
           );

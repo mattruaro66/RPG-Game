@@ -169,7 +169,7 @@ ul.compact li { margin: 0.2em 0; }
 .slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1em; margin-top: 1em; }
 
 /* Jogo */
-.game-screen { display: grid; grid-template-columns: 250px minmax(0, 1fr) 380px; grid-template-rows: auto minmax(0, 1fr); grid-template-areas: 'top top top' 'party main info'; height: 100vh; }
+.game-screen { display: grid; grid-template-columns: 250px minmax(0, 1fr) 380px; grid-template-rows: auto minmax(0, 1fr); grid-template-areas: 'top top top' 'party main info'; height: 100%; }
 .topbar { grid-area: top; display: flex; align-items: center; justify-content: space-between; gap: 1em; padding: 0.4em 16px; border-bottom: 1px solid var(--ash); background: #0f0e0d; flex-wrap: wrap; }
 .topbar-title { display: flex; flex-direction: column; line-height: 1.2; }
 .topbar-title strong { font-family: var(--font-type); color: var(--paper); }
@@ -295,7 +295,7 @@ ul.compact li { margin: 0.2em 0; }
   .col-info { border-left: none; border-top: 1px solid var(--ash); }
 }
 @media (max-width: 760px) {
-  .game-screen { display: flex; flex-direction: column; height: auto; min-height: 100vh; }
+  .game-screen { display: flex; flex-direction: column; height: auto; min-height: 100%; }
   .col-party { border-right: none; border-bottom: 1px solid var(--ash); }
   .party-panel { flex-direction: row; overflow-x: auto; }
   .party-card { min-width: 220px; }
