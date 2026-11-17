@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "build:artifact": "vite build && node scripts/build-artifact.mjs"
+    "build:artifact": "vite build && node scripts/build-artifact.mjs",
+    "image-prompts": "node scripts/image-prompts.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",

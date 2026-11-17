@@ -89,5 +89,14 @@ Nenhuma solução provisória deve ser tratada como regra definitiva.
 
 | Código | Status | Tema | Solução atual | Pergunta |
 |---|---|---|---|---|
-| P-26 | PENDENTE | Narrador por modelo de linguagem | Narrador local (texto autoral + ambientação + falas por personalidade). Interface `NarratorProvider` pronta para um provedor LLM, que só poderá propor texto — nunca efeitos mecânicos | Usar LLM? Qual provedor, custo e onde guardar a chave de API (não pode ficar exposta no navegador)? |
+| P-26 | PROVISÓRIO | IA de linguagem como narrador | No artefato publicado, o Claude (recurso `sample`) **interpreta respostas livres** e as encaixa numa ação disponível; quando nada corresponde, responde com 1–3 frases sem criar fatos. Recebe só a camada do jogador. Fora do claude.ai, interpretador local por palavras. Geração livre de cenas/diálogos novos pela IA: não implementada | A IA pode criar diálogos de NPC inéditos (sem efeitos mecânicos)? Pode improvisar cenas? |
 | P-39 | PROVISÓRIO | Até 4 pessoas + mestre | Cada personagem pode ser “Jogador” ou “IA” (troca a qualquer momento na ficha) — jogo local compartilhado. Modo Mestre opcional mostra a camada interna e permite conceder XP e avançar o tempo | Haverá multijogador em rede? O mestre humano deve poder editar cenas em tempo real? |
+
+## Imagens, voz e resposta livre
+
+| Código | Status | Tema | Solução atual | Pergunta |
+|---|---|---|---|---|
+| P-43 | PROVISÓRIO | Licença das fotos de acervo | Só fotos em domínio público, CC0, CC BY ou CC BY-SA, com crédito na tela e na Galeria. CC BY-SA exige compartilhar derivados sob a mesma licença | Se o jogo for comercializado, substituir as fotos CC BY-SA por imagens próprias? |
+| P-44 | PROVISÓRIO | Vozes por personagem | Há 4 vozes disponíveis; distribuição inicial arbitrária, ajustável em Configurações | Qual voz para cada personagem? |
+| P-45 | PROVISÓRIO | Resposta livre sem ação correspondente | O narrador responde, passam 5 minutos, nenhum efeito mecânico | Uma tentativa sem correspondência deve custar mais tempo ou ter consequências? |
+| P-46 | PENDENTE | Imagens de personagens, NPCs e objetos | Vagas com prompts prontos (`IMAGE_PROMPTS.md`); o dono/editor envia pela Galeria do jogo publicado | Gerar e enviar as imagens |

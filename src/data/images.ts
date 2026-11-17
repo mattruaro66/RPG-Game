@@ -34,6 +34,11 @@ export interface ImageSlot {
 export const NOIR_STYLE =
   'black and white 35mm film photograph, New York City, December 1992, film noir lighting, deep shadows, high contrast, visible film grain, Kodak Tri-X 400 pushed, documentary realism, no text, no watermark, no logos';
 
+/** Fotos de acervo: modificadas (preto e branco, escurecidas, vinheta e grão). */
+const archive = (id: string, credit: string, license: string, source: string): { bundled: BundledImage } => ({
+  bundled: { file: `img/${id}.jpg`, credit, license: `${license} · modificada`, source },
+});
+
 const slot = (id: string, kind: ImageKind, title: string, caption: string, subject: string, extra: Partial<ImageSlot> = {}): ImageSlot => ({
   id,
   kind,
@@ -45,15 +50,16 @@ const slot = (id: string, kind: ImageKind, title: string, caption: string, subje
 
 export const IMAGE_SLOTS: ImageSlot[] = [
   // Locais
-  slot('cena_prologo', 'local', 'Manhattan, inverno de 1992', 'A cidade que nunca dorme.', 'wide view of the Manhattan skyline at dusk in winter 1992 with the Twin Towers, lit office windows, cold haze over the river'),
-  slot('cena_escritorio', 'local', 'Escritório de Jack Sullivan', 'Rua 46 Oeste, quarto andar.', 'small run-down private investigator office on the 4th floor of an old Midtown building, wooden desk covered with unpaid bills and envelopes, cast-iron radiator, venetian blinds casting striped shadows, neon from the street outside, rotary phone, overflowing ashtray, dusk'),
+  slot('cena_prologo', 'local', 'Manhattan, inverno de 1992', 'A cidade que nunca dorme.', 'wide view of the Manhattan skyline at dusk in winter 1992 with the Twin Towers, lit office windows, cold haze over the river', archive('cena_prologo', 'Sander Lamme', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Skyline_Twin_Towers_Sander_Lamme.jpg')),
+  slot('cena_escritorio', 'local', 'Escritório de Jack Sullivan', 'Rua 46 Oeste, quarto andar.', 'small run-down private investigator office on the 4th floor of an old Midtown building, wooden desk covered with unpaid bills and envelopes, cast-iron radiator, venetian blinds casting striped shadows, neon from the street outside, rotary phone, overflowing ashtray, dusk', archive('cena_escritorio', 'Infrogmation of New Orleans', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Lower_East_Side,_Manhattan,_October_1995_01.jpg')),
   slot('cena_portaria', 'local', 'Portaria, Rua 78 Leste', 'Mármore gasto e um espelho dourado.', 'lobby of a prewar Upper East Side apartment building at night, worn marble floor, gilded mirror, brass elevator doors, a doorman desk with a tiny television glowing, green awning visible through glass doors'),
   slot('cena_apartamento', 'local', 'Apartamento 5C', 'Alguém já esteve aqui.', 'ransacked upscale Manhattan apartment living room at night, drawers pulled out on the floor, slashed sofa cushions, books torn from shelves, a gold wristwatch untouched on the coffee table, cold streetlight through tall windows, mahogany desk'),
   slot('cena_invasao', 'local', 'Corredor do quinto andar', 'Passos pesados param diante do 5C.', 'dim apartment building hallway, two young men in leather jackets silhouetted at an apartment door, one holding a ring of keys, single bare bulb, long shadows, tension'),
-  slot('cena_rua', 'local', 'Rua 78 Leste, noite', 'Vapor sobe dos bueiros.', 'Upper East Side street at night in winter, steam rising from manholes, wet asphalt reflecting streetlights, a dark sedan with its engine running, yellow cab passing'),
+  slot('cena_rua', 'local', 'Rua 78 Leste, noite', 'Vapor sobe dos bueiros.', 'Upper East Side street at night in winter, steam rising from manholes, wet asphalt reflecting streetlights, a dark sedan with its engine running, yellow cab passing', archive('cena_rua', 'Infrogmation of New Orleans', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Lower_East_Side,_Manhattan,_October_1995_02.jpg')),
   slot('cena_fim', 'local', 'Midtown, madrugada', 'Café requentado e pistas sobre a mesa.', 'detective office at 3am, single desk lamp, evidence spread on the desk: a leather datebook, a matchbox, a microcassette, photocopies, a cold cup of coffee, tired figures in silhouette'),
-  slot('loc_ludlow', 'local', 'Ludlow Street', 'Lower East Side.', 'Lower East Side street with tenements and fire escapes at night, an unmarked black door with a small silver sign, 1990s club scene, punks and goths smoking outside'),
-  slot('loc_bellevue', 'local', 'Bellevue Hospital', 'Pronto-socorro, Manhattan.', 'exterior of Bellevue Hospital in Manhattan at night, ambulance bay lights, wet pavement, 1990s'),
+  slot('loc_ludlow', 'local', 'Ludlow Street', 'Lower East Side.', 'Lower East Side street with tenements and fire escapes at night, an unmarked black door with a small silver sign, 1990s club scene, punks and goths smoking outside', archive('loc_ludlow', 'Infrogmation of New Orleans', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Lower_East_Side,_Manhattan,_October_1995_03.jpg')),
+  slot('loc_bellevue', 'local', 'Bellevue Hospital', 'Pronto-socorro, Manhattan.', 'exterior of Bellevue Hospital in Manhattan at night, ambulance bay lights, wet pavement, 1990s', archive('loc_bellevue', 'Eden, Janine and Jim', 'CC BY 2.0', 'https://commons.wikimedia.org/wiki/File:Bellevue_Hospital_Center.jpg')),
+  slot('loc_metro', 'local', 'Metrô, linha N', 'O último trem da noite.', 'New York subway platform late at night, an old silver N train arriving, flickering fluorescent lights, empty platform', archive('loc_metro', 'Alex Lozupone', 'CC BY 4.0', 'https://commons.wikimedia.org/wiki/File:Downfolders-downfolder29-2011_01_31_12_56_15.jpg')),
 
   // NPCs
   slot('npc_victoria', 'npc', 'Victoria Whitmore', 'A cliente.', 'portrait of an elegant woman in her thirties wearing an extravagant red dress, a long red overcoat to the ankles, dark sunglasses at night and leather gloves, standing in a dark office doorway, unreadable expression', { keepColor: true }),
@@ -78,7 +84,7 @@ export const IMAGE_SLOTS: ImageSlot[] = [
   slot('obj_banheiro', 'objeto', 'O banheiro', 'Limpo demais.', 'spotless bathroom with a clawfoot tub, faint dark stains in the grout around the drain, bleach bottle on the floor, harsh light'),
   slot('obj_fosforos', 'objeto', 'Caixa de fósforos do Nocturne', 'Um símbolo desenhado por dentro da tampa.', 'close-up of a black matchbox with silver letters reading NOCTURNE, open, a hand-drawn ink symbol inside the lid: a circle cut by a vertical line surrounded by small marks like teeth'),
   slot('obj_halcyon', 'objeto', 'Transferências da Halcyon', 'Assinatura autorizada: R. Whitmore.', 'photocopies of bank wire transfer orders in a manila envelope hidden in a desk compartment, handwritten note in the margin'),
-  slot('obj_seda', 'objeto', 'O sedã escuro', 'O motor ligado. Ninguém desce.', 'dark sedan parked across the street at night with engine running, fogged windows, seen from a fifth-floor window'),
+  slot('obj_seda', 'objeto', 'O sedã escuro', 'O motor ligado. Ninguém desce.', 'dark sedan parked across the street at night with engine running, fogged windows, seen from a fifth-floor window', archive('obj_seda', 'Infrogmation of New Orleans', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Lower_East_Side,_Manhattan,_October_1995_04.jpg')),
 ];
 
 export const IMAGE_BY_ID: Record<string, ImageSlot> = Object.fromEntries(IMAGE_SLOTS.map((s) => [s.id, s]));

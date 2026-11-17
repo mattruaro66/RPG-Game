@@ -25,7 +25,8 @@ src/
     state.ts             GameState serializável (camadas do jogador e interna)
   data/                  Conteúdo (personagens, especialidades, bônus, itens, inimigos)
     campaign/            Prólogo, caso Reed, casos-gancho, camada interna, registro
-  ai/                    IA dos companheiros/inimigos e narrador local (NarratorProvider)
+  ai/                    IA dos companheiros/inimigos, narrador local e interpretador de respostas livres
+  platform/              Recursos do artefato (Claude, voz, ditado, imagens), todos opcionais
   state/                 session.ts (ações puras estado→estado) e GameContext (React)
   persistence/           Salvamento versionado, slots, configurações
   screens/, components/  Interface
@@ -73,6 +74,12 @@ Capítulo “O desaparecimento de Thomas Reed”: escritório → portaria → a
 - [x] Adaptação à composição do grupo (sem Jack, sem Ray etc.)
 - [x] Encerramento provisório com ganchos para Bellevue e Village Voice
 
+### Fase 5 — Imersão ✅
+- [x] Resposta livre: o jogador escreve (ou dita) o que o personagem diz ou faz; o Claude interpreta dentro das ações disponíveis; interpretador local como alternativa
+- [x] Narração e diálogos falados (vozes do Claude em pt-BR, uma por personagem; voz do navegador como alternativa)
+- [x] Fotos: catálogo de 28 vagas (locais, NPCs, protagonistas, objetos), fotos de acervo com crédito, envio de imagens pela Galeria, tratamento noir automático
+- [x] `IMAGE_PROMPTS.md` com prompts prontos para gerar as imagens que faltam
+
 ## Próximas etapas (ordem sugerida)
 
 1. **Revisão do criador** de `PENDING_DECISIONS.md` (especialmente P-02, P-06, P-11/12/13, P-16, P-24, P-27 e P-31).
@@ -81,9 +88,9 @@ Capítulo “O desaparecimento de Thomas Reed”: escritório → portaria → a
 4. **Nocturne**: ponto de convergência proposto das três linhas.
 5. **Reações de antagonistas** dirigidas pelos estados da conspiração (eventos que disparam por limiar e tempo).
 6. **Progressão**: tela de gasto de melhorias assim que P-16 for decidido.
-7. **Narrador LLM opcional** (P-26) via `NarratorProvider`, com chave fora do navegador.
+7. **Narrador LLM ampliado** (P-26): falas inéditas de NPCs e improviso de cenas, sempre sem efeitos mecânicos.
 8. **Disciplinas** e regras sobrenaturais quando especificadas.
-9. Retratos ilustrados e áudio ambiente.
+9. Gerar e enviar as imagens pendentes (P-46); trilha e sons ambientes.
 
 ## Verificações disponíveis
 
