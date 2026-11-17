@@ -11,6 +11,7 @@ import { ATTRIBUTE_LABELS, type CharacterId } from '../engine/types';
 import { chooseOption, interact, resolvePending } from '../state/session';
 import { useGame } from '../state/GameContext';
 import { Tag } from './ui';
+import { FreeInput } from './FreeInput';
 
 const KIND_LABELS: Record<Interaction['kind'], string> = {
   examinar: 'Examinar',
@@ -134,6 +135,7 @@ export function Actions({ game }: { game: GameState }) {
             </button>
           ))}
         </div>
+        <FreeInput game={game} />
       </div>
     );
   }
@@ -167,6 +169,7 @@ export function Actions({ game }: { game: GameState }) {
         </div>
       ))}
       {list.length === 0 && <p className="muted">Nada mais a fazer aqui por enquanto.</p>}
+      <FreeInput game={game} />
     </div>
   );
 }

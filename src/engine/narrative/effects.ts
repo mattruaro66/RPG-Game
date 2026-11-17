@@ -72,6 +72,7 @@ export function enterScene(s: GameState, dice: Dice, sceneId: string): void {
   if (!scene) throw new Error(`Cena desconhecida: ${sceneId}`);
   s.sceneId = sceneId;
   s.dialogue = null;
+  s.visual = scene.image;
   pushNarrative(s, 'cena', scene.title);
   for (const b of renderBlocks(scene.intro, s)) pushNarrative(s, 'texto', b.text);
   if (!s.journal.locations.includes(scene.location)) s.journal.locations.push(scene.location);
@@ -91,6 +92,7 @@ export function enterDialogueNode(s: GameState, dice: Dice, dialogueId: string, 
   const node = dlg?.nodes[nodeId];
   if (!node) throw new Error(`Nó de diálogo desconhecido: ${dialogueId}/${nodeId}`);
   s.dialogue = { dialogueId, nodeId };
+  if (dlg.image) s.visual = dlg.image;
   const npc = content().npcs[dlg.npc];
   for (const b of renderBlocks(node.text, s)) {
     const speaker = b.speaker ?? node.speaker;
@@ -219,6 +221,7 @@ export function applyEffect(s: GameState, dice: Dice, e: Effect, ctx: EffectCont
       break;
     case 'endDialogue':
       s.dialogue = null;
+      s.visual = c.scenes[s.sceneId]?.image;
       break;
     case 'combat': {
       const enc = c.encounters[e.encounter];

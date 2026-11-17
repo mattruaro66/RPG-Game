@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { SceneImage } from '../components/SceneImage';
+import { useVoice } from '../platform/voice';
 import { Actions } from '../components/Actions';
 import { CharacterSheet } from '../components/CharacterSheet';
 import { CombatView } from '../components/Combat';
@@ -12,8 +14,30 @@ import type { CharacterId } from '../engine/types';
 import { useGame } from '../state/GameContext';
 
 export function GameScreen() {
-  const { game, go, save, settings } = useGame();
+  const { game, go, save, settings, setSettings } = useGame();
   const [sheet, setSheet] = useState<CharacterId | null>(null);
+  const voice = useVoice();
+  const lastSpoken = useRef<number | null>(null);
+
+  // Narração automática: lê o que acabou de acontecer.
+  useEffect(() => {
+    if (!game) return;
+    const last = game.narrative[game.narrative.length - 1]?.id ?? 0;
+    if (lastSpoken.current === null) {
+      // Ao abrir a tela, lê a cena atual (a partir do último título de cena).
+      lastSpoken.current = last;
+      if (!settings.autoNarrate) return;
+      let start = game.narrative.length - 1;
+      while (start > 0 && game.narrative[start].kind !== 'cena') start--;
+      voice.speakEntries(game.narrative.slice(start).slice(0, 14));
+      return;
+    }
+    if (last <= lastSpoken.current) return;
+    const fresh = game.narrative.filter((e) => e.id > lastSpoken.current!);
+    lastSpoken.current = last;
+    if (settings.autoNarrate && !game.combat) voice.speakEntries(fresh);
+  }, [game?.narrative, settings.autoNarrate]); // eslint-disable-line react-hooks/exhaustive-deps
+
   if (!game) return null;
   const scene = content().scenes[game.sceneId];
   const loc = content().locations[scene.location as keyof ReturnType<typeof content>['locations']];
@@ -29,7 +53,18 @@ export function GameScreen() {
           <span>{formatDate(game.time)}</span>
           <strong>{formatClock(game.time)}</strong>
         </div>
+        <div className="voice-controls" aria-label="Narração">
+          {voice.mode !== 'nenhuma' && (
+            <label className="check small" title={voice.mode === 'claude' ? 'Vozes do Claude' : 'Voz do navegador'}>
+              <input type="checkbox" checked={settings.autoNarrate} onChange={(e) => { setSettings({ ...settings, autoNarrate: e.target.checked }); if (!e.target.checked) voice.stop(); }} />
+              Narração
+            </label>
+          )}
+          {voice.speaking && <button className="btn-small" onClick={voice.stop}>■ Parar áudio</button>}
+          {voice.error && <span className="small warning">{voice.error}</span>}
+        </div>
         <nav className="topbar-nav">
+          <button className="btn-small" onClick={() => go('galeria')}>Galeria</button>
           <button className="btn-small" disabled={!!game.combat} onClick={() => save('slot1')}>Salvar</button>
           <button className="btn-small" onClick={() => go('carregar')}>Arquivos</button>
           <button className="btn-small" onClick={() => go('config')}>Config.</button>
@@ -42,6 +77,7 @@ export function GameScreen() {
       </aside>
 
       <main className="col-main">
+        <SceneImage slotId={game.visual ?? content().scenes[game.sceneId]?.image} compact={!!game.combat} />
         {game.combat ? (
           <CombatView game={game} />
         ) : (

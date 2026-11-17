@@ -4,12 +4,17 @@ import type { GameState } from '../engine/state';
 import type { CharacterSelection } from '../engine/party';
 import { DEFAULT_SETTINGS, loadGame, loadSettings, saveGame, saveSettings, type Settings, type SlotId } from '../persistence/storage';
 import { newGame } from './session';
+import { DEFAULT_VOICES } from '../platform/voice';
+import type { Voice } from '../platform/claude';
 
-export type Screen = 'menu' | 'prologo' | 'selecao' | 'jogo' | 'personagens' | 'regras' | 'config' | 'carregar';
+export type Screen = 'menu' | 'prologo' | 'selecao' | 'jogo' | 'personagens' | 'regras' | 'config' | 'carregar' | 'galeria';
 
 export interface AppSettings extends Settings {
   minDamage: MinDamagePolicy;
   bonusOnusConflict: BonusOnusConflictPolicy;
+  autoNarrate: boolean;
+  voiceRate: number;
+  voices: Record<string, Voice>;
 }
 
 interface Ctx {
@@ -31,7 +36,9 @@ const GameCtx = createContext<Ctx | null>(null);
 
 function initialSettings(): AppSettings {
   const base = loadSettings() as Partial<AppSettings>;
-  return { ...DEFAULT_SETTINGS, minDamage: 0, bonusOnusConflict: 'onus_prevalece', ...base } as AppSettings;
+  const s = { ...DEFAULT_SETTINGS, minDamage: 0, bonusOnusConflict: 'onus_prevalece', autoNarrate: true, voiceRate: 1, ...base } as AppSettings;
+  s.voices = { ...DEFAULT_VOICES, ...(base.voices ?? {}) };
+  return s;
 }
 
 export function GameProvider({ children }: { children: ReactNode }) {

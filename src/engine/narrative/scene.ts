@@ -134,7 +134,7 @@ export function finalizeTest(s: GameState, dice: Dice, pending: PendingTest, rer
     applyEffects(s, dice, option.effects ?? [], { actorId: pending.actorId });
     if (s.dialogue && !s.combat) {
       const next = outcome.next !== undefined ? outcome.next : option.next;
-      if (next === null) s.dialogue = null;
+      if (next === null) closeDialogue(s);
       else if (next) enterDialogueNode(s, dice, pending.source.dialogueId, next);
     }
   }
@@ -148,6 +148,7 @@ export function performInteraction(s: GameState, dice: Dice, interactionId: stri
   if (it.once && s.usedInteractions.includes(interactionKey(scene.id, it.id))) return;
 
   pushNarrative(s, 'sistema', `▸ ${it.label}`);
+  if (it.image) s.visual = it.image;
   const duration = it.timeCost ?? defaultDuration(it.kind);
   advanceTime(s, duration);
   for (const b of renderBlocks(it.text, s)) pushNarrative(s, b.speaker ? 'fala' : 'texto', b.text, b.speaker);
@@ -196,14 +197,23 @@ export function visibleOptions(s: GameState): DialogueOption[] {
   return cur.node.options.filter((o) => evaluate(o.if, s) && !(o.once && s.usedInteractions.includes(`dlg:${cur.dialogue.id}:${o.id}`)));
 }
 
-export function chooseDialogueOption(s: GameState, dice: Dice, optionId: string, actorId?: CharacterId, helperIds: CharacterId[] = []): void {
+function closeDialogue(s: GameState): void {
+  s.dialogue = null;
+  s.visual = currentScene(s)?.image;
+}
+
+/**
+ * Executa uma opção de diálogo. Com `spokenText`, a fala exibida é a do
+ * jogador (resposta livre) em vez do rótulo da opção.
+ */
+export function chooseDialogueOption(s: GameState, dice: Dice, optionId: string, actorId?: CharacterId, helperIds: CharacterId[] = [], spokenText?: string): void {
   if (s.pendingTest || s.combat) return;
   const cur = currentDialogueNode(s);
   if (!cur) return;
   const opt = visibleOptions(s).find((o) => o.id === optionId);
   if (!opt) return;
   const speaker = actorId ?? s.contactId;
-  pushNarrative(s, 'fala', opt.label, nameOf(speaker));
+  pushNarrative(s, 'fala', spokenText ?? opt.label, nameOf(speaker));
   advanceTime(s, 3);
   if (opt.test) {
     const actor = actorId ?? defaultActor(s, opt.test);
@@ -214,7 +224,7 @@ export function chooseDialogueOption(s: GameState, dice: Dice, optionId: string,
   if (opt.once) s.usedInteractions.push(`dlg:${cur.dialogue.id}:${opt.id}`);
   applyEffects(s, dice, opt.effects ?? [], { actorId: speaker });
   if (s.dialogue && !s.combat) {
-    if (opt.next === null) s.dialogue = null;
+    if (opt.next === null) closeDialogue(s);
     else if (opt.next) enterDialogueNode(s, dice, cur.dialogue.id, opt.next);
   }
 }

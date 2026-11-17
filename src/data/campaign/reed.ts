@@ -19,6 +19,7 @@ import type { ClueDef, Dialogue, DocumentDef, EncounterDef, NpcDef, ObjectiveDef
 export const REED_SCENES: Scene[] = [
   {
     id: 'escritorio',
+    image: 'cena_escritorio',
     title: 'Midtown, Rua 46 Oeste — fim de tarde',
     location: 'loc_escritorio',
     caseId: 'caso_reed',
@@ -41,7 +42,7 @@ export const REED_SCENES: Scene[] = [
     ],
     interactions: [
       {
-        id: 'jornal', label: 'Examinar o jornal do dia', kind: 'examinar', once: true,
+        id: 'jornal', image: 'obj_jornal', label: 'Examinar o jornal do dia', kind: 'examinar', once: true,
         text: [
           { text: 'O Daily News, dobrado na página doze: “CORPO SEM IDENTIFICAÇÃO ENCONTRADO NO PIER 40 — o terceiro em novembro, segundo funcionários do necrotério”. Três parágrafos. Nenhum nome. Nenhuma causa da morte.' },
           { text: 'Liz reconhece a história. É exatamente o tipo de coisa que alguém tem tentado lhe contar há semanas.', if: { hasCharacter: 'liz' } },
@@ -49,7 +50,7 @@ export const REED_SCENES: Scene[] = [
         effects: [{ type: 'clue', id: 'noticia_corpos' }],
       },
       {
-        id: 'gaveta', label: 'Abrir a gaveta da escrivaninha', kind: 'examinar', once: true,
+        id: 'gaveta', image: 'obj_promissoria', label: 'Abrir a gaveta da escrivaninha', kind: 'examinar', once: true,
         text: [
           { text: 'Jack abriu a gaveta que evitava. Entre recibos de penhor, a nota promissória: trezentos mil dólares devidos a Richard Whitmore. A assinatura dele, firme demais para quem sabia que não poderia pagar.', if: { contactIs: 'jack' } },
           { text: 'Na gaveta de Jack, entre recibos de penhor, {contato} encontra uma nota promissória: trezentos mil dólares devidos a Richard Whitmore. Talvez isso explique o sumiço.', if: { contactIsNot: 'jack' } },
@@ -79,7 +80,7 @@ export const REED_SCENES: Scene[] = [
         ],
       },
       {
-        id: 'ligar_victoria', label: 'Telefonar para Victoria Whitmore e aceitar o caso', kind: 'dialogo', once: true,
+        id: 'ligar_victoria', image: 'obj_cartao', label: 'Telefonar para Victoria Whitmore e aceitar o caso', kind: 'dialogo', once: true,
         if: { all: [{ flag: 'caso_recusado' }, { notFlag: 'caso_aceito' }, { hasItem: 'cartao_victoria' }] },
         text: [
           { text: 'O número do cartão toca seis vezes. Quando ela atende, a voz não demonstra surpresa.' },
@@ -105,6 +106,7 @@ export const REED_SCENES: Scene[] = [
   },
   {
     id: 'portaria',
+    image: 'cena_portaria',
     title: 'Rua 78 Leste, nº 211 — portaria',
     location: 'loc_predio_thomas',
     caseId: 'caso_reed',
@@ -181,6 +183,7 @@ export const REED_SCENES: Scene[] = [
   },
   {
     id: 'apartamento',
+    image: 'cena_apartamento',
     title: 'Apartamento 5C',
     location: 'loc_apartamento',
     caseId: 'caso_reed',
@@ -192,7 +195,7 @@ export const REED_SCENES: Scene[] = [
     onEnter: [{ type: 'objective', id: 'obj_apartamento', status: 'ativo' }],
     interactions: [
       {
-        id: 'sala', label: 'Examinar a sala', kind: 'examinar', once: true,
+        id: 'sala', image: 'cena_apartamento', label: 'Examinar a sala', kind: 'examinar', once: true,
         text: [{ text: 'Gavetas no chão. Almofadas cortadas. Livros arrancados da estante e abertos, como se alguém procurasse algo entre as páginas. Mas a televisão continua no lugar, o aparelho de som também — e um Rolex de ouro repousa intocado sobre a mesa de centro.' }],
         effects: [{ type: 'clue', id: 'apartamento_revirado' }],
       },
@@ -218,12 +221,12 @@ export const REED_SCENES: Scene[] = [
         },
       },
       {
-        id: 'escrivaninha', label: 'Examinar a escrivaninha', kind: 'examinar', once: true,
+        id: 'escrivaninha', image: 'obj_agenda', label: 'Examinar a escrivaninha', kind: 'examinar', once: true,
         text: [{ text: 'Sob uma pilha de extratos rasgados, uma agenda de couro de 1992. Os compromissos de Thomas são meticulosos até 19 de novembro. Depois disso, várias páginas foram arrancadas com cuidado, rente à costura.' }],
         effects: [{ type: 'item', itemId: 'agenda_thomas' }, { type: 'clue', id: 'agenda_thomas' }],
       },
       {
-        id: 'agenda_decalque', label: 'Procurar marcas na página seguinte às arrancadas', kind: 'investigar', once: true,
+        id: 'agenda_decalque', image: 'obj_agenda', label: 'Procurar marcas na página seguinte às arrancadas', kind: 'investigar', once: true,
         if: { clue: 'agenda_thomas' },
         hint: 'Raciocínio. Uma única tentativa: uma falha borra o papel.',
         test: { kind: 'd20', label: 'Perícia Documental', attribute: 'raciocinio', specialty: 'pericia_documental', altSpecialties: ['falsificacao', 'documentar'], tags: ['perceber_detalhes', 'execucao_cuidadosa'] },
@@ -239,7 +242,7 @@ export const REED_SCENES: Scene[] = [
         },
       },
       {
-        id: 'fundo_falso', label: 'Abrir o fundo falso da escrivaninha', kind: 'examinar', once: true,
+        id: 'fundo_falso', image: 'obj_halcyon', label: 'Abrir o fundo falso da escrivaninha', kind: 'examinar', once: true,
         if: { flag: 'fundo_falso_revelado' },
         text: [{ text: 'Um painel de madeira cede com um clique. Dentro, um envelope pardo: fotocópias de transferências bancárias da Halcyon Holdings para contas numeradas nas Ilhas Cayman. Assinatura autorizada em todas: R. Whitmore.' }],
         effects: [{ type: 'clue', id: 'documentos_halcyon' }, { type: 'document', id: 'doc_halcyon' }],
@@ -255,7 +258,7 @@ export const REED_SCENES: Scene[] = [
         },
       },
       {
-        id: 'secretaria', label: 'Ouvir a secretária eletrônica', kind: 'examinar', once: true, timeCost: 15,
+        id: 'secretaria', image: 'obj_secretaria', label: 'Ouvir a secretária eletrônica', kind: 'examinar', once: true, timeCost: 15,
         text: [
           { text: 'A luz vermelha pisca. Três mensagens.' },
           { text: '“Thomas, sou eu. Me liga. Por favor.” — uma voz feminina, contida. Sábado, 21 de novembro.', speaker: 'Mensagem 1' },
@@ -269,7 +272,7 @@ export const REED_SCENES: Scene[] = [
         ],
       },
       {
-        id: 'banheiro', label: 'Examinar o banheiro', kind: 'investigar', once: true,
+        id: 'banheiro', image: 'obj_banheiro', label: 'Examinar o banheiro', kind: 'investigar', once: true,
         hint: 'Raciocínio. Um sucesso revela mais — e cobra um preço.',
         text: [{ text: 'O cheiro de água sanitária vem daqui. Azulejos impecáveis, toalhas dobradas. Limpo demais.' }],
         test: { kind: 'd20', label: 'Medicina Legal', attribute: 'raciocinio', specialty: 'medicina_legal', altSpecialties: ['investigacao_de_campo', 'anatomia'], tags: ['perceber_detalhes'], allowCooperation: true },
@@ -290,7 +293,7 @@ export const REED_SCENES: Scene[] = [
         },
       },
       {
-        id: 'casaco', label: 'Revistar o casaco pendurado', kind: 'examinar', once: true,
+        id: 'casaco', image: 'obj_fosforos', label: 'Revistar o casaco pendurado', kind: 'examinar', once: true,
         text: [{ text: 'Um sobretudo de cashmere, caro, esquecido no cabide — num inverno de três graus. No bolso, uma caixa de fósforos preta com letras prateadas: NOCTURNE — Ludlow St.' }],
         effects: [
           { type: 'item', itemId: 'fosforos_nocturne' },
@@ -299,7 +302,7 @@ export const REED_SCENES: Scene[] = [
         ],
       },
       {
-        id: 'simbolo', label: 'Estudar o desenho dentro da caixa de fósforos', kind: 'investigar', once: true,
+        id: 'simbolo', image: 'obj_fosforos', label: 'Estudar o desenho dentro da caixa de fósforos', kind: 'investigar', once: true,
         if: { clue: 'fosforos_nocturne' },
         hint: 'Raciocínio. Símbolos e tradições.',
         text: [{ text: 'Por dentro da tampa, alguém desenhou a caneta um círculo cortado por uma linha vertical, cercado de pequenas marcas, como dentes.' }],
@@ -314,7 +317,7 @@ export const REED_SCENES: Scene[] = [
         },
       },
       {
-        id: 'janela', label: 'Observar a rua pela janela', kind: 'investigar', once: true,
+        id: 'janela', image: 'obj_seda', label: 'Observar a rua pela janela', kind: 'investigar', once: true,
         hint: 'Raciocínio. Perceber vigilância.',
         test: { kind: 'd20', label: 'Vigilância', attribute: 'raciocinio', specialty: 'vigilancia', altSpecialties: ['contrainteligencia', 'seguranca_operacional'], tags: ['perceber_ameaca', 'perceber_detalhes'] },
         outcomes: {
@@ -330,13 +333,13 @@ export const REED_SCENES: Scene[] = [
         },
       },
       {
-        id: 'passos', label: 'Passos no corredor…', kind: 'acao', timeCost: 0,
+        id: 'passos', image: 'cena_invasao', label: 'Passos no corredor…', kind: 'acao', timeCost: 0,
         if: { all: [{ used: 'apartamento:escrivaninha' }, { used: 'apartamento:secretaria' }, { notFlag: 'invasores_chegaram' }] },
         text: [{ text: 'Passos pesados no corredor. Param diante do 5C.' }],
         effects: [{ type: 'flag', key: 'invasores_chegaram' }, { type: 'goto', scene: 'invasao' }],
       },
       {
-        id: 'sair', label: 'Ir embora do apartamento', kind: 'mover', timeCost: 5,
+        id: 'sair', image: 'npc_invasores', label: 'Ir embora do apartamento', kind: 'mover', timeCost: 5,
         if: { notFlag: 'invasores_chegaram' },
         text: [{ text: 'Ao abrir a porta, dão de cara com dois homens no corredor. Um deles segura um molho de chaves. O outro, a mão dentro da jaqueta.' }],
         effects: [{ type: 'flag', key: 'invasores_chegaram' }, { type: 'goto', scene: 'invasao' }],
@@ -350,6 +353,7 @@ export const REED_SCENES: Scene[] = [
   },
   {
     id: 'invasao',
+    image: 'cena_invasao',
     title: 'Apartamento 5C — visitantes',
     location: 'loc_apartamento',
     caseId: 'caso_reed',
@@ -382,7 +386,7 @@ export const REED_SCENES: Scene[] = [
         },
       },
       {
-        id: 'confrontar', label: 'Encará-los e mandá-los embora', kind: 'acao', once: true,
+        id: 'confrontar', image: 'npc_invasores', label: 'Encará-los e mandá-los embora', kind: 'acao', once: true,
         hint: 'Presença. Autoridade e impacto. Falhar provoca a briga.',
         test: { kind: 'd20', label: 'Interrogatório', attribute: 'presenca', specialty: 'interrogatorio', altSpecialties: ['persuasao', 'manipulacao', 'lideranca_tatica'], tags: ['autoridade', 'impacto_social'] },
         outcomes: {
@@ -423,6 +427,7 @@ export const REED_SCENES: Scene[] = [
   },
   {
     id: 'rua',
+    image: 'cena_rua',
     title: 'Rua 78 Leste — noite',
     location: 'loc_rua78',
     caseId: 'caso_reed',
@@ -441,6 +446,7 @@ export const REED_SCENES: Scene[] = [
   },
   {
     id: 'fim_capitulo',
+    image: 'cena_fim',
     title: 'Midtown — madrugada',
     location: 'loc_escritorio',
     caseId: 'caso_reed',
@@ -479,6 +485,7 @@ export const REED_DIALOGUES: Dialogue[] = [
   {
     id: 'victoria',
     npc: 'victoria',
+    image: 'npc_victoria',
     start: 'chegada',
     nodes: {
       chegada: {
@@ -604,6 +611,7 @@ export const REED_DIALOGUES: Dialogue[] = [
   {
     id: 'sal',
     npc: 'sal',
+    image: 'npc_sal',
     start: 'balcao',
     nodes: {
       balcao: {
@@ -719,26 +727,26 @@ export const REED_ENCOUNTERS: EncounterDef[] = [
 // ---------------------------------------------------------------------------
 
 export const REED_CLUES: ClueDef[] = [
-  { id: 'thomas_desaparecido', caseId: 'caso_reed', importance: 'essencial', title: 'Thomas Reed desapareceu', description: 'Thomas Reed, 38 anos, consultor financeiro, desapareceu há onze dias. É amante de Victoria Whitmore, que acredita que ele esteja morto.', location: 'loc_escritorio', characters: ['victoria', 'thomas'], related: ['endereco_thomas'], memoryDetail: 'Victoria se referiu a Thomas no passado duas vezes antes de dizer que acreditava que ele estivesse morto.' },
+  { id: 'thomas_desaparecido', image: 'npc_thomas', caseId: 'caso_reed', importance: 'essencial', title: 'Thomas Reed desapareceu', description: 'Thomas Reed, 38 anos, consultor financeiro, desapareceu há onze dias. É amante de Victoria Whitmore, que acredita que ele esteja morto.', location: 'loc_escritorio', characters: ['victoria', 'thomas'], related: ['endereco_thomas'], memoryDetail: 'Victoria se referiu a Thomas no passado duas vezes antes de dizer que acreditava que ele estivesse morto.' },
   { id: 'endereco_thomas', caseId: 'caso_reed', importance: 'essencial', title: 'Endereço de Thomas Reed', description: 'Rua 78 Leste, nº 211, apartamento 5C, Upper East Side. O porteiro se chama Sal.', location: 'loc_escritorio', characters: ['victoria', 'sal'], related: ['thomas_desaparecido'] },
   { id: 'richard_influencia', caseId: 'caso_reed', importance: 'importante', title: 'Os amigos de Richard Whitmore', description: 'Segundo Victoria, o marido tem amigos na polícia e “em lugares que você provavelmente nem imagina”. Ela não pode procurar a polícia.', location: 'loc_escritorio', characters: ['victoria', 'richard'], related: ['divida_richard'] },
-  { id: 'divida_richard', caseId: 'caso_reed', importance: 'importante', title: 'A dívida de Jack', description: 'Jack Sullivan deve trezentos mil dólares a Richard Whitmore.', location: 'loc_escritorio', characters: ['richard'], related: ['richard_influencia', 'documentos_halcyon'] },
-  { id: 'victoria_observada', caseId: 'caso_reed', importance: 'secundaria', title: 'Algo em Victoria', description: 'Não tirou os óculos escuros. Falou de Thomas no passado. Mãos frias num escritório aquecido.', location: 'loc_escritorio', characters: ['victoria'], related: [] },
+  { id: 'divida_richard', image: 'obj_promissoria', caseId: 'caso_reed', importance: 'importante', title: 'A dívida de Jack', description: 'Jack Sullivan deve trezentos mil dólares a Richard Whitmore.', location: 'loc_escritorio', characters: ['richard'], related: ['richard_influencia', 'documentos_halcyon'] },
+  { id: 'victoria_observada', image: 'npc_victoria', caseId: 'caso_reed', importance: 'secundaria', title: 'Algo em Victoria', description: 'Não tirou os óculos escuros. Falou de Thomas no passado. Mãos frias num escritório aquecido.', location: 'loc_escritorio', characters: ['victoria'], related: [] },
   { id: 'visitantes_apartamento', caseId: 'caso_reed', importance: 'importante', title: 'Os homens da “seguradora”', description: 'Três noites atrás, dois homens dizendo ser de uma seguradora subiram ao 5C às onze da noite e saíram com uma caixa de arquivo.', location: 'loc_predio_thomas', characters: ['sal'], related: ['busca_profissional', 'conversa_invasores'] },
-  { id: 'apartamento_revirado', caseId: 'caso_reed', importance: 'essencial', title: 'Apartamento revirado', description: 'O apartamento foi revistado, mas objetos de valor — inclusive um Rolex de ouro — ficaram intocados.', location: 'loc_apartamento', characters: ['thomas'], related: ['busca_profissional'] },
+  { id: 'apartamento_revirado', image: 'cena_apartamento', caseId: 'caso_reed', importance: 'essencial', title: 'Apartamento revirado', description: 'O apartamento foi revistado, mas objetos de valor — inclusive um Rolex de ouro — ficaram intocados.', location: 'loc_apartamento', characters: ['thomas'], related: ['busca_profissional'] },
   { id: 'busca_profissional', caseId: 'caso_reed', importance: 'importante', title: 'Uma busca profissional', description: 'Quem revistou o apartamento procurava papéis e trabalhou com método, sem fazer barulho.', location: 'loc_apartamento', characters: [], related: ['apartamento_revirado', 'visitantes_apartamento'] },
-  { id: 'agenda_thomas', caseId: 'caso_reed', importance: 'essencial', title: 'A agenda de Thomas', description: 'Compromissos meticulosos até 19 de novembro. As páginas seguintes foram arrancadas.', location: 'loc_apartamento', characters: ['thomas'], related: ['agenda_decalque'], memoryDetail: 'Na última página intacta, a letra de Thomas fica mais apertada e inclinada — como a de alguém com pressa ou com medo.' },
-  { id: 'agenda_decalque', caseId: 'caso_reed', importance: 'importante', title: '“R.W. — Ludlow”', description: 'Marcas na agenda: “20/11 — 23h — R.W. — Ludlow. Levar as cópias.”', location: 'loc_apartamento', characters: ['thomas'], related: ['agenda_thomas', 'fosforos_nocturne', 'divida_richard'] },
-  { id: 'documentos_halcyon', caseId: 'caso_reed', importance: 'importante', title: 'Transferências da Halcyon Holdings', description: 'Fotocópias de transferências da Halcyon Holdings para contas numeradas nas Ilhas Cayman, todas autorizadas por “R. Whitmore”.', location: 'loc_apartamento', characters: ['richard', 'thomas'], related: ['agenda_decalque', 'mensagens_secretaria'] },
-  { id: 'mensagens_secretaria', caseId: 'caso_reed', importance: 'importante', title: 'Três mensagens', description: 'Uma mulher pedindo que Thomas ligue (21/11). Um homem dizendo que “os números não fecham” (20/11). E uma ligação silenciosa às 3h04 de 24/11, com um som de gotas ao fundo.', location: 'loc_apartamento', characters: ['thomas'], related: ['documentos_halcyon'], memoryDetail: 'A voz da primeira mensagem é a de Victoria Whitmore. A do homem, não é a de ninguém que vocês já tenham ouvido.' },
-  { id: 'vestigios_sangue', caseId: 'caso_reed', importance: 'essencial', title: 'O banheiro limpo demais', description: 'O banheiro foi lavado com água sanitária. Restam manchas escuras no rejunte, perto do ralo da banheira.', location: 'loc_apartamento', characters: ['thomas'], related: ['prontuario_desaparecido'] },
-  { id: 'fosforos_nocturne', caseId: 'caso_reed', importance: 'essencial', title: 'Nocturne — Ludlow St.', description: 'Uma caixa de fósforos de um lugar chamado Nocturne, na Ludlow Street, Lower East Side, no bolso do casaco de Thomas.', location: 'loc_apartamento', characters: ['thomas'], related: ['agenda_decalque', 'conversa_invasores', 'simbolo_fosforos'] },
-  { id: 'simbolo_fosforos', caseId: 'caso_reed', importance: 'importante', title: 'O símbolo na caixa de fósforos', description: 'Um círculo cortado por uma linha vertical, cercado de pequenas marcas, desenhado à caneta.', location: 'loc_apartamento', characters: [], related: ['fosforos_nocturne'] },
-  { id: 'vigilancia_rua', caseId: 'caso_reed', importance: 'secundaria', title: 'O sedã escuro', description: 'Um carro escuro com o motor ligado vigiava o prédio de Thomas.', location: 'loc_apartamento', characters: [], related: [] },
+  { id: 'agenda_thomas', image: 'obj_agenda', caseId: 'caso_reed', importance: 'essencial', title: 'A agenda de Thomas', description: 'Compromissos meticulosos até 19 de novembro. As páginas seguintes foram arrancadas.', location: 'loc_apartamento', characters: ['thomas'], related: ['agenda_decalque'], memoryDetail: 'Na última página intacta, a letra de Thomas fica mais apertada e inclinada — como a de alguém com pressa ou com medo.' },
+  { id: 'agenda_decalque', image: 'obj_agenda', caseId: 'caso_reed', importance: 'importante', title: '“R.W. — Ludlow”', description: 'Marcas na agenda: “20/11 — 23h — R.W. — Ludlow. Levar as cópias.”', location: 'loc_apartamento', characters: ['thomas'], related: ['agenda_thomas', 'fosforos_nocturne', 'divida_richard'] },
+  { id: 'documentos_halcyon', image: 'obj_halcyon', caseId: 'caso_reed', importance: 'importante', title: 'Transferências da Halcyon Holdings', description: 'Fotocópias de transferências da Halcyon Holdings para contas numeradas nas Ilhas Cayman, todas autorizadas por “R. Whitmore”.', location: 'loc_apartamento', characters: ['richard', 'thomas'], related: ['agenda_decalque', 'mensagens_secretaria'] },
+  { id: 'mensagens_secretaria', image: 'obj_secretaria', caseId: 'caso_reed', importance: 'importante', title: 'Três mensagens', description: 'Uma mulher pedindo que Thomas ligue (21/11). Um homem dizendo que “os números não fecham” (20/11). E uma ligação silenciosa às 3h04 de 24/11, com um som de gotas ao fundo.', location: 'loc_apartamento', characters: ['thomas'], related: ['documentos_halcyon'], memoryDetail: 'A voz da primeira mensagem é a de Victoria Whitmore. A do homem, não é a de ninguém que vocês já tenham ouvido.' },
+  { id: 'vestigios_sangue', image: 'obj_banheiro', caseId: 'caso_reed', importance: 'essencial', title: 'O banheiro limpo demais', description: 'O banheiro foi lavado com água sanitária. Restam manchas escuras no rejunte, perto do ralo da banheira.', location: 'loc_apartamento', characters: ['thomas'], related: ['prontuario_desaparecido'] },
+  { id: 'fosforos_nocturne', image: 'obj_fosforos', caseId: 'caso_reed', importance: 'essencial', title: 'Nocturne — Ludlow St.', description: 'Uma caixa de fósforos de um lugar chamado Nocturne, na Ludlow Street, Lower East Side, no bolso do casaco de Thomas.', location: 'loc_apartamento', characters: ['thomas'], related: ['agenda_decalque', 'conversa_invasores', 'simbolo_fosforos'] },
+  { id: 'simbolo_fosforos', image: 'obj_fosforos', caseId: 'caso_reed', importance: 'importante', title: 'O símbolo na caixa de fósforos', description: 'Um círculo cortado por uma linha vertical, cercado de pequenas marcas, desenhado à caneta.', location: 'loc_apartamento', characters: [], related: ['fosforos_nocturne'] },
+  { id: 'vigilancia_rua', image: 'obj_seda', caseId: 'caso_reed', importance: 'secundaria', title: 'O sedã escuro', description: 'Um carro escuro com o motor ligado vigiava o prédio de Thomas.', location: 'loc_apartamento', characters: [], related: [] },
   { id: 'conversa_invasores', caseId: 'caso_reed', importance: 'importante', title: '“Lá no Nocturne não aceitam desculpa”', description: 'Os invasores procuravam uma caderneta. O “chefe” acredita que Reed fez cópias e as deixou com alguém. Eles respondem a alguém ligado ao Nocturne.', location: 'loc_apartamento', characters: [], related: ['fosforos_nocturne', 'visitantes_apartamento'] },
   { id: 'bilhete_invasor', caseId: 'caso_reed', importance: 'importante', title: 'O bilhete do invasor', description: 'Um papel amassado com um endereço e um horário.', location: 'loc_apartamento', characters: [], related: ['conversa_invasores', 'fosforos_nocturne'] },
   // Ganchos para as outras investigações
-  { id: 'noticia_corpos', caseId: 'caso_voice', importance: 'secundaria', title: 'Corpo sem identificação no Pier 40', description: 'Segundo o Daily News, é o terceiro corpo não identificado em novembro. Sem nome, sem causa da morte.', location: 'loc_escritorio', characters: [], related: [] },
+  { id: 'noticia_corpos', image: 'obj_jornal', caseId: 'caso_voice', importance: 'secundaria', title: 'Corpo sem identificação no Pier 40', description: 'Segundo o Daily News, é o terceiro corpo não identificado em novembro. Sem nome, sem causa da morte.', location: 'loc_escritorio', characters: [], related: [] },
   { id: 'prontuario_desaparecido', caseId: 'caso_bellevue', importance: 'secundaria', title: 'O prontuário desaparecido', description: 'O prontuário do paciente que morreu no Bellevue, com perda sanguínea inexplicável, sumiu do arquivo depois da visita de um homem de terno escuro.', location: 'loc_escritorio', characters: ['daniel'], related: ['vestigios_sangue'] },
 ];
 

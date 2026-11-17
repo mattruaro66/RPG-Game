@@ -1,12 +1,14 @@
 import type { ReactNode } from 'react';
+import { useImages } from '../platform/images';
 import { CHARACTER_BY_ID } from '../data/characters';
 import type { CharacterId } from '../engine/types';
 
 export function Portrait({ id, size = 56, dim = false }: { id: CharacterId; size?: number; dim?: boolean }) {
   const def = CHARACTER_BY_ID[id];
+  const img = useImages().resolve(`retrato_${id}`);
   return (
     <div className={`portrait portrait-${id}${dim ? ' dim' : ''}`} style={{ width: size, height: size * 1.25, fontSize: size * 0.36 }} aria-hidden>
-      <span>{def.initials}</span>
+      {img?.url ? <img src={img.url} alt="" /> : <span>{def.initials}</span>}
     </div>
   );
 }

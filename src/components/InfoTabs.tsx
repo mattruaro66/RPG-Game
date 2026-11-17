@@ -12,6 +12,7 @@ import type { CharacterId } from '../engine/types';
 import { addHypothesis, dailySanity, gmAdvanceTime, gmGrantXp, gmTrack, pickUp, psychiatry, removeHypothesis, treatOutOfCombat } from '../state/session';
 import { useGame } from '../state/GameContext';
 import { Tag } from './ui';
+import { Thumb } from './SceneImage';
 
 type TabId = 'diario' | 'objetivos' | 'inventario' | 'cuidados' | 'mapa' | 'dados' | 'mestre';
 
@@ -76,6 +77,7 @@ function Journal({ game }: { game: GameState }) {
               const showMemory = def.memoryDetail && cl.witnesses.some((w) => memoryHolders.has(w));
               return (
                 <li key={cl.id} className="clue">
+                  <Thumb slotId={def.image} alt={def.title} className="clue-thumb" />
                   <div className="clue-head"><strong>{def.title}</strong> <Tag tone={IMPORTANCE[def.importance].tone}>{IMPORTANCE[def.importance].label}</Tag></div>
                   <p>{def.description}</p>
                   {cl.extras.map((e) => <p key={e} className="clue-extra">+ {e}</p>)}

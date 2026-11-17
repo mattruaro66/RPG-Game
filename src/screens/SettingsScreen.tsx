@@ -1,9 +1,12 @@
 import { useGame } from '../state/GameContext';
 import { PROVISIONAL } from '../config/rules';
 import { Tag } from '../components/ui';
+import { VOICES, VOICE_ROLES, useVoice } from '../platform/voice';
+import type { Voice } from '../platform/claude';
 
 export function SettingsScreen() {
   const { go, settings, setSettings, game } = useGame();
+  const voice = useVoice();
   return (
     <main className="doc-screen">
       <header className="doc-head">
@@ -24,6 +27,32 @@ export function SettingsScreen() {
           </label>
           <label className="check"><input type="checkbox" checked={settings.gmMode} onChange={(e) => setSettings({ ...settings, gmMode: e.target.checked })} /> Modo Mestre <Tag tone="wine">revela informações ocultas</Tag></label>
           <p className="muted">O Modo Mestre mostra a camada interna da campanha (estados da conspiração, notas secretas) e permite conceder XP e avançar o tempo. Use apenas se houver um mestre humano.</p>
+        </section>
+        <section className="paper-card">
+          <h2>Narração e vozes</h2>
+          <p className="small muted">
+            {voice.mode === 'claude' ? 'Usando as vozes do Claude.' : voice.mode === 'navegador' ? 'Vozes do Claude indisponíveis aqui (fora do claude.ai, Safari ou apps móveis). Usando a voz do navegador.' : 'Este navegador não oferece áudio de narração.'}
+          </p>
+          <label className="check"><input type="checkbox" checked={settings.autoNarrate} onChange={(e) => setSettings({ ...settings, autoNarrate: e.target.checked })} /> Ler automaticamente narrações e diálogos</label>
+          <label className="field">Velocidade da fala
+            <select id="voice-rate" value={settings.voiceRate} onChange={(e) => setSettings({ ...settings, voiceRate: Number(e.target.value) })}>
+              <option value={0.85}>Lenta</option>
+              <option value={1}>Normal</option>
+              <option value={1.15}>Rápida</option>
+            </select>
+          </label>
+          <div className="voice-grid">
+            {VOICE_ROLES.map((r) => (
+              <label key={r.key} className="field">{r.label}
+                <span className="row tight">
+                  <select id={`voice-${r.key}`} value={settings.voices[r.key] ?? 'rounded'} onChange={(e) => setSettings({ ...settings, voices: { ...settings.voices, [r.key]: e.target.value as Voice } })}>
+                    {VOICES.map((v) => <option key={v.id} value={v.id}>{v.label}</option>)}
+                  </select>
+                  {voice.mode !== 'nenhuma' && <button className="btn-small" onClick={() => voice.speakText(`Nova Iorque, primeiro de dezembro de mil novecentos e noventa e dois.`, r.key)}>Testar</button>}
+                </span>
+              </label>
+            ))}
+          </div>
         </section>
         <section className="paper-card">
           <h2>Regras provisórias configuráveis</h2>

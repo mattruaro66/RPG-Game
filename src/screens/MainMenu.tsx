@@ -17,6 +17,7 @@ export function MainMenu() {
           </button>
           <button onClick={() => go('carregar')}>Carregar Jogo</button>
           <button onClick={() => go('personagens')}>Personagens</button>
+          <button onClick={() => go('galeria')}>Galeria de imagens</button>
           <button onClick={() => go('regras')}>Regras</button>
           <button onClick={() => go('config')}>Configurações</button>
         </nav>

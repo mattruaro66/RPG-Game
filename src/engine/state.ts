@@ -176,5 +176,7 @@ export interface GameState {
   diceLog: DiceLogEntry[];
   seq: number;
   gameOver: null | { reason: string };
+  /** Imagem em foco na tela (slot em data/images). */
+  visual?: string;
   lastTier?: Tier;
 }

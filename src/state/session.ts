@@ -24,6 +24,7 @@ import { SAVE_VERSION, type GameState, type TrackId } from '../engine/state';
 import { dayIndex } from '../engine/time';
 import type { CharacterId, ControlMode, Dice } from '../engine/types';
 import type { StorageLocation } from '../data/items';
+import type { Interpretation } from '../ai/interpreter';
 
 export let narrator: NarratorProvider = localNarrator;
 
@@ -134,6 +135,31 @@ export function chooseOption(s: GameState, optionId: string, actorId?: Character
 export function resolvePending(s: GameState, reroll: boolean): GameState {
   if (!s.pendingTest) return s;
   return run(s, (d, dice) => finalizeTest(d, dice, d.pendingTest!, reroll));
+}
+
+/**
+ * Resposta livre do jogador, já interpretada. Se corresponder a uma ação
+ * disponível, o motor a executa com as regras normais; senão, só o
+ * narrador responde (sem efeitos mecânicos).
+ */
+export function freeText(s: GameState, playerText: string, interp: Interpretation, speakerId?: CharacterId): GameState {
+  const text = playerText.trim();
+  if (!text) return s;
+  return run(s, (d, dice) => {
+    const actor = interp.actorId ?? speakerId;
+    const speaker = shortName(CHARACTER_BY_ID[actor ?? d.contactId]);
+    if (interp.actionId && d.dialogue) {
+      chooseDialogueOption(d, dice, interp.actionId, actor ?? undefined, [], text);
+      return;
+    }
+    pushNarrative(d, 'fala', text, speaker);
+    if (interp.actionId) {
+      performInteraction(d, dice, interp.actionId, actor ?? undefined);
+      return;
+    }
+    advanceTime(d, 5);
+    if (interp.narration) pushNarrative(d, 'ia', interp.narration, 'Narrador');
+  });
 }
 
 // ---------------------------------------------------------------------------

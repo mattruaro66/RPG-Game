@@ -113,6 +113,8 @@ export interface Interaction {
   outcomes?: Outcomes;
   /** Nota visível ao jogador sobre o que está em jogo. */
   hint?: string;
+  /** Imagem mostrada ao executar a interação (id de slot em data/images). */
+  image?: string;
 }
 
 export interface Scene {
@@ -126,6 +128,8 @@ export interface Scene {
   ambientTags?: ContextTag[];
   /** Sinal do Instinto de Perigo — sem revelar a origem. */
   dangerSense?: string;
+  /** Imagem da cena (id de slot em data/images). */
+  image?: string;
   interactions: Interaction[];
 }
 
@@ -154,6 +158,8 @@ export interface DialogueNode {
 export interface Dialogue {
   id: string;
   npc: string;
+  /** Imagem mostrada durante a conversa. */
+  image?: string;
   start: string;
   nodes: Record<string, DialogueNode>;
 }
@@ -175,6 +181,7 @@ export interface ClueDef {
   related: string[];
   /** Revelado apenas se alguém com Memória Fotográfica estava presente. */
   memoryDetail?: string;
+  image?: string;
 }
 
 export interface NpcDef {
